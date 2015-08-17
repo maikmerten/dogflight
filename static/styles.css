@@ -7,17 +7,24 @@ canvas#flycanvas {
 	float: left;
 }
 
-div#scorecontainer {
+div#rightcol {
 	float: left;
 	margin:5px;
 }
 
-div#scorecontainer li {
+div#rightcol li {
 	list-style-type: none;
 	margin:3px;
 	padding:3px;
 }
 
-div#scorecontainer ul {
+div#rightcol ul {
 	padding:0px;
+}
+
+span.key {
+	margin:5px;
+	padding:5px;
+	border: 1px solid #AAA;
+	border-radius:5px;
 }
