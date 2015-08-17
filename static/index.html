@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+<head>
+<title>Dogflight!</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<h1>Dogflight!</h1>
+
+<p>
+You control the green plane. Rotate clockwise by having the mouse positioned in the lower region of the playfield, counter-clockwise by having the mouse in the upper region. Positioning the mouse pointer in the central region will stop rotation. Fire by clicking.
+</p>
+
+<canvas id="flycanvas" width="640" height="480"></canvas>
+
+<div id="scorecontainer">
+	<h2>Score</h2>
+	<ul id="scores"></ul>
+</div>
+
+
+<audio src="fire.mp3" id="sound0" preload="auto"></audio>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/jquery.js"></script>
+<script src="fly.js"></script>
+<script src="fly-client.js"></script>
+
+<script>
+var socket = io();
+var canvas = $("#flycanvas");
+var joined = false;
+var player = -1;
+var width = -1;
+var height = -1;
+var renderer = null;
+
+var nick = null;
+while(nick == null) {
+	nick = window.prompt("Nickname", "Nick");
+}
+
+var controlInfo = {
+	"d" : 0,
+	"f" : false
+}
+
+var mousex = 320;
+var mousey = 240;
+canvas.mousemove(function(evt) {
+	mousex = evt.pageX - canvas[0].offsetLeft;
+	mousey = evt.pageY - canvas[0].offsetTop;
+	sendControl();
+});
+
+var fire = false;
+canvas.mousedown(function(evt) {
+	fire = true;
+	sendControl();
+});
+canvas.mouseup(function(evt) {
+	fire = false;
+	sendControl();
+});
+canvas.mouseout(function(evt) {
+	fire = false;
+	sendControl();
+});
+
+function sendControl() {
+	if(!joined) return;
+
+	var d = 0;
+	if(mousey > canvas[0].height / 2 + 75) {
+		d = 1;
+	} else if(mousey < canvas[0].height / 2 - 75) {
+		d = -1;
+	}
+
+	if(controlInfo.d != d || controlInfo.f != fire) {
+		controlInfo.d = d;
+		controlInfo.f = fire;
+		socket.emit("controlUpdate", controlInfo);
+	}
+}
+
+
+socket.on("joinInfo", function(info) {
+	console.log(JSON.stringify(info));
+	joined = true;
+	player = info.player;
+	width = info.width;
+	height = info.height;
+
+	canvas.attr("width", width);
+	canvas.attr("height", height);
+
+	renderer = new FlyRenderer(player, canvas[0]);
+
+});
+
+socket.on("worldUpdate", function(update) {
+	if(!joined) return;
+
+	var ctx = canvas[0].getContext("2d");
+	renderer.renderBackdrop();
+	for(var i = 0; i < update.length; ++i) {
+		renderer.renderMsg(update[i]);
+	}
+	renderer.renderForeground();
+});
+
+socket.on("scores", function(update) {
+	var list = $("#scores").empty();
+	var nicks = update.nicks;
+	var scores = update.scores;
+	var players = update.players;
+
+	for(var i = 0; i < nicks.length && i < scores.length && i < players.length; ++i) {
+		var text = nicks[i] + ": " + scores[i];
+		if(player === players[i]) {
+			list.append($("<li>").append($("<b>").text(text)));
+		} else {
+			list.append($("<li>").text(text));
+		}
+	}
+});
+
+
+socket.emit("join", { "nick": nick });
+
+
+</script>
+
+</body>
+</html>

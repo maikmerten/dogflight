@@ -1,0 +1,23 @@
+body {
+	font-family: Arial,sans-serif
+}
+
+canvas#flycanvas {
+	border: solid 2px black;
+	float: left;
+}
+
+div#scorecontainer {
+	float: left;
+	margin:5px;
+}
+
+div#scorecontainer li {
+	list-style-type: none;
+	margin:3px;
+	padding:3px;
+}
+
+div#scorecontainer ul {
+	padding:0px;
+}
