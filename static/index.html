@@ -9,7 +9,7 @@
 <h1>Dogflight!</h1>
 
 <p>
-You control the green plane. Rotate clockwise by having the mouse positioned in the lower region of the playfield, counter-clockwise by having the mouse in the upper region. Positioning the mouse pointer in the central region will stop rotation. Fire by clicking.
+You control the green plane. Rotate clockwise by having the mouse positioned in the lower region of the playfield or by pressing the "down"-key, counter-clockwise by having the mouse in the upper region or pressing the "up"-key. Positioning the mouse pointer in the central region will stop rotation. Fire by clicking or pressing the space bar.
 </p>
 
 <canvas id="flycanvas" width="640" height="480"></canvas>
@@ -46,11 +46,18 @@ var controlInfo = {
 	"f" : false
 }
 
-var mousex = 320;
-var mousey = 240;
+var dir = 0;
 canvas.mousemove(function(evt) {
-	mousex = evt.pageX - canvas[0].offsetLeft;
-	mousey = evt.pageY - canvas[0].offsetTop;
+	var mousex = evt.pageX - canvas[0].offsetLeft;
+	var mousey = evt.pageY - canvas[0].offsetTop;
+
+	dir = 0;
+	if(mousey > canvas[0].height / 2 + 75) {
+		dir = 1;
+	} else if(mousey < canvas[0].height / 2 - 75) {
+		dir = -1;
+	}
+
 	sendControl();
 });
 
@@ -58,6 +65,7 @@ var fire = false;
 canvas.mousedown(function(evt) {
 	fire = true;
 	sendControl();
+	evt.preventDefault();
 });
 canvas.mouseup(function(evt) {
 	fire = false;
@@ -68,18 +76,48 @@ canvas.mouseout(function(evt) {
 	sendControl();
 });
 
+$(document).keydown(function(evt) {
+	switch(evt.which) {
+		case 32: // space
+			fire = true;
+			sendControl();
+			break;
+		case 38: // up
+			dir = -1;
+			sendControl();
+			break;
+		case 40: // down
+			dir = 1;
+			sendControl();
+			break;
+		default: return;
+	}
+	evt.preventDefault();
+});
+
+$(document).keyup(function(evt) {
+	switch(evt.which) {
+		case 32: // space
+			fire = false;
+			sendControl();
+			break;
+		case 38: // up
+		case 40: // down
+			dir = 0;
+			sendControl();
+			break;
+		default: return;
+	}
+	evt.preventDefault();
+});
+
+
 function sendControl() {
 	if(!joined) return;
 
-	var d = 0;
-	if(mousey > canvas[0].height / 2 + 75) {
-		d = 1;
-	} else if(mousey < canvas[0].height / 2 - 75) {
-		d = -1;
-	}
 
-	if(controlInfo.d != d || controlInfo.f != fire) {
-		controlInfo.d = d;
+	if(controlInfo.d != dir || controlInfo.f != fire) {
+		controlInfo.d = dir;
 		controlInfo.f = fire;
 		socket.emit("controlUpdate", controlInfo);
 	}
