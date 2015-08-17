@@ -208,13 +208,13 @@ FlyPlane = function(_world, _x, _y, _player) {
 
 	
 	this.getNetMsg = function() {
-		return {
-			"t" : (this.type|0),
-			"p" : (this.player|0),
-			"x" : (this.x|0),
-			"y" : (this.y|0),
-			"a" : (angle * 400)|0
-		}
+		return [
+			(this.type|0),
+			(this.player|0),
+			(this.x|0),
+			(this.y|0),
+			((angle * 400)|0)
+		];
 	}
 }
 
@@ -278,11 +278,11 @@ FlyBullet = function(_world, _x, _y, _angle, _player) {
 	}
 
 	this.getNetMsg = function() {
-		return {
-			"t" : (this.type|0),
-			"x" : (this.x|0),
-			"y" : (this.y|0)
-		}
+		return [
+			(this.type|0),
+			(this.x|0),
+			(this.y|0)
+		];
 	}
 }
 
@@ -296,10 +296,7 @@ FlySound = function(_world, _sound) {
 	this.think = function(){};
 
 	this.getNetMsg = function() {
-		msg = {
-			"t" : 2,
-			"s" : this.sound
-		}
+		var msg = [2, this.sound];
 		world.remove(this);
 		return msg;
 	}

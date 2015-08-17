@@ -49,9 +49,10 @@ FlyRenderer = function(player, canvas) {
 	}
 
 	this.renderPlane = function(ctx, msg) {
-		var x = msg.x;
-		var y = msg.y;
-		var angle = msg.a * 0.0025 * Math.PI;
+		var p = msg[1];
+		var x = msg[2];
+		var y = msg[3];
+		var angle = msg[4] * 0.0025 * Math.PI;
 
 		var x_tip = x + (Math.cos(angle) * 12);
 		var y_tip = y + (Math.sin(angle) * 12);
@@ -65,7 +66,7 @@ FlyRenderer = function(player, canvas) {
 		var x_wing_r = x + (Math.cos(angle_wing_r) * 10);
 		var y_wing_r = y + (Math.sin(angle_wing_r) * 10);
 
-		ctx.fillStyle = msg.p === player ? "#0F0" : "#F00";
+		ctx.fillStyle = (p === player) ? "#0F0" : "#F00";
 		ctx.beginPath();
 		ctx.moveTo(x, y);
 		ctx.lineTo(x_wing_l,y_wing_l);
@@ -79,8 +80,8 @@ FlyRenderer = function(player, canvas) {
 	}
 
 	this.renderBullet = function(ctx, msg) {
-		var x = msg.x;
-		var y = msg.y;
+		var x = msg[1];
+		var y = msg[2];
 
 		ctx.fillStyle = "#000";
 		ctx.beginPath();
@@ -89,7 +90,8 @@ FlyRenderer = function(player, canvas) {
 	}
 
 	this.renderSound = function(msg) {
-		var audio = $("#sound" + msg.s);
+		var sound = msg[1];
+		var audio = $("#sound" + sound);
 		if(audio[0]) {
 			audio[0].play();
 		}
@@ -97,7 +99,7 @@ FlyRenderer = function(player, canvas) {
 
 	this.renderMsg = function(msg) {
 		var ctx = canvas.getContext("2d");
-		var type = msg.t;
+		var type = msg[0];
 
 		switch(type) {
 			case 0:
