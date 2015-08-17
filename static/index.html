@@ -9,7 +9,7 @@
 <h1>Dogflight!</h1>
 
 <p>
-You control the green plane. Rotate clockwise by having the mouse positioned in the lower region of the playfield or by pressing the "down"-key, counter-clockwise by having the mouse in the upper region or pressing the "up"-key. Positioning the mouse pointer in the central region will stop rotation. Fire by clicking or pressing the space bar.
+You control the green plane. Rotate clockwise by having the mouse positioned in the lower region of the playfield or by pressing the "right"-key, counter-clockwise by having the mouse in the upper region or pressing the "left"-key. Positioning the mouse pointer in the central region will stop rotation. Fire by clicking or pressing the space bar.
 </p>
 
 <canvas id="flycanvas" width="640" height="480"></canvas>
@@ -82,11 +82,11 @@ $(document).keydown(function(evt) {
 			fire = true;
 			sendControl();
 			break;
-		case 38: // up
+		case 37: // left
 			dir = -1;
 			sendControl();
 			break;
-		case 40: // down
+		case 39: // down
 			dir = 1;
 			sendControl();
 			break;
@@ -101,8 +101,8 @@ $(document).keyup(function(evt) {
 			fire = false;
 			sendControl();
 			break;
-		case 38: // up
-		case 40: // down
+		case 37: // up
+		case 39: // down
 			dir = 0;
 			sendControl();
 			break;
