@@ -103,7 +103,8 @@ FlyRenderer = function(player, canvas) {
 		var sound = msg[1];
 		var audio = $("#sound" + sound);
 		if(audio[0]) {
-			audio[0].play();
+			var src = audio[0].src;
+			$("<audio>").attr("src", src).attr("autoplay",1);
 		}
 	}
 
