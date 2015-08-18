@@ -158,12 +158,17 @@ socket.on("scores", function(update) {
 	var scores = update.scores;
 	var players = update.players;
 
+	if(renderer == null) {
+		return;
+	}
+
 	for(var i = 0; i < nicks.length && i < scores.length && i < players.length; ++i) {
+		var color = renderer.getPlayerColor(players[i]);
 		var text = nicks[i] + ": " + scores[i];
 		if(player === players[i]) {
-			list.append($("<li>").append($("<b>").text(text)));
+			list.append($("<li>").css("color", color).append($("<b>").text(text)));
 		} else {
-			list.append($("<li>").text(text));
+			list.append($("<li>").css("color", color).text(text));
 		}
 	}
 });

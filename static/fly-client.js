@@ -112,7 +112,7 @@ FlyRenderer = function(player, canvas) {
 		if(vectrex) {
 			ctx.fillStyle = (p === player) ? "#FFF" : "#000";
 		} else {
-			ctx.fillStyle = (p === player) ? "#0F0" : "#F00";
+			ctx.fillStyle = this.getPlayerColor(p);
 		}
 		
 		ctx.beginPath();
@@ -161,6 +161,26 @@ FlyRenderer = function(player, canvas) {
 				break;
 		}
 
+	}
+
+	this.getPlayerColor = function(p) {
+		if(p === player) {
+			return "#0F0";
+		}
+
+		var colors = [
+			"#F00",
+			"#00F",
+			"#FF0",
+			"#F0F",
+			"#0FF",
+			"#F06",
+			"#60F",
+			"#909",
+			"#990",
+			"#099"
+		];
+		return colors[p % colors.length];
 	}
 
 }
