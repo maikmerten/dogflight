@@ -177,7 +177,7 @@ FlyPlane = function(_world, _x, _y, _player) {
 		this.y = y;
 
 		// fire if ready
-		if(fire && now > lastfire + firedelay) {
+		if(fire && this.health > 0 && now > lastfire + firedelay) {
 			this.fire();
 		}
 	}
