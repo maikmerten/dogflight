@@ -1,14 +1,19 @@
 
 FlyRenderer = function(player, canvas) {
 	var that = this;
+	var vectrex = true;
 
 	this.renderBackdrop = function() {
 		var ctx = canvas.getContext("2d");
 
-		var grd = ctx.createLinearGradient(0, 0, 0, canvas.height);
-		grd.addColorStop(0, "#449");
-		grd.addColorStop(1, "#aaf");
-		ctx.fillStyle=grd;
+		if(vectrex) {
+			ctx.fillStyle = "#000";
+		} else {
+			var grd = ctx.createLinearGradient(0, 0, 0, canvas.height);
+			grd.addColorStop(0, "#449");
+			grd.addColorStop(1, "#aaf");
+			ctx.fillStyle=grd;
+		}
 		ctx.fillRect(0,0, canvas.width, canvas.height);
 	}
 
@@ -17,9 +22,9 @@ FlyRenderer = function(player, canvas) {
 		var width = canvas.width;
 		var height = canvas.height;
 
-		ctx.lineWidth = 3;
-		ctx.strokeStyle = "#CCC";
-		ctx.fillStyle = "#FFF";
+		ctx.lineWidth = vectrex ? 2 : 3;
+		ctx.strokeStyle = vectrex ? "#FFF" : "#CCC";
+		ctx.fillStyle = vectrex ? "#000" : "#FFF";
 
 		// cloud
 		ctx.save();
@@ -66,7 +71,12 @@ FlyRenderer = function(player, canvas) {
 		var x_wing_r = x + (Math.cos(angle_wing_r) * 10);
 		var y_wing_r = y + (Math.sin(angle_wing_r) * 10);
 
-		ctx.fillStyle = (p === player) ? "#0F0" : "#F00";
+		if(vectrex) {
+			ctx.fillStyle = (p === player) ? "#FFF" : "#000";
+		} else {
+			ctx.fillStyle = (p === player) ? "#0F0" : "#F00";
+		}
+		
 		ctx.beginPath();
 		ctx.moveTo(x, y);
 		ctx.lineTo(x_wing_l,y_wing_l);
@@ -75,7 +85,7 @@ FlyRenderer = function(player, canvas) {
 		ctx.closePath();
 		ctx.fill();
 		ctx.lineWidth = 2;
-		ctx.strokeStyle = "#000";
+		ctx.strokeStyle = vectrex? "#FFF" : "#000";
 		ctx.stroke();
 	}
 
@@ -83,7 +93,7 @@ FlyRenderer = function(player, canvas) {
 		var x = msg[1];
 		var y = msg[2];
 
-		ctx.fillStyle = "#000";
+		ctx.fillStyle = vectrex? "#FFF" : "#000";
 		ctx.beginPath();
 		ctx.arc(x, y, 2, 0, 2 * Math.PI, false);
 		ctx.fill();
