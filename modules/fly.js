@@ -141,7 +141,7 @@ FlyPlane = function(_world, _x, _y, _player) {
 		lasttic = now;
 
 		var direction = dir;
-		var rotspeed = 0.4; 		// revolutions per two seconds!
+		var rotspeed = 0.6; 		// revolutions per two seconds!
 		var speed = 100; 			// pixels per second!
 
 		// rotate if dead
