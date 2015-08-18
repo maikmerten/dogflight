@@ -6,8 +6,15 @@ FlyWorld = function(_width, _height) {
 	var killents = [];	// entities that are to be removed from this world
 	var scoreCallback = function(){};
 
+	this.time = new Date().getTime();
+	var lasttic = this.time;
 
 	this.think = function() {
+		// update time
+		this.time = new Date().getTime();
+		this.timedelta = (this.time - lasttic) * 0.001;
+		lasttic = this.time;
+
 		// remove entities marked for removal
 		for(var i = 0; i < killents.length; ++i) {
 			var idx = entities.indexOf(killents[i]);
@@ -124,9 +131,6 @@ FlyPlane = function(_world, _x, _y, _player) {
 	var recovertime = 0;
 	var recoverdelay = 1333;	
 
-	var lasttic = new Date().getTime();
-	var now = lasttic;
-
 	// public members
 	this.health = 100;
 	this.x = _x;
@@ -136,9 +140,7 @@ FlyPlane = function(_world, _x, _y, _player) {
 
 	// Quake-style think function :)
 	this.think = function() {
-		now = new Date().getTime();
-		var timedelta = (now - lasttic) * 0.001;
-		lasttic = now;
+		var timedelta = world.timedelta;
 
 		var direction = dir;
 		var rotspeed = 0.6; 		// revolutions per two seconds!
@@ -149,7 +151,7 @@ FlyPlane = function(_world, _x, _y, _player) {
 			direction = 1;
 			rotspeed = 5;
 			speed = 0;
-			if(now > recovertime) {
+			if(world.time > recovertime) {
 				this.health = 100;
 			}
 		}
@@ -177,13 +179,13 @@ FlyPlane = function(_world, _x, _y, _player) {
 		this.y = y;
 
 		// fire if ready
-		if(fire && this.health > 0 && now > lastfire + firedelay) {
+		if(fire && this.health > 0 && world.time > lastfire + firedelay) {
 			this.fire();
 		}
 	}
 
 	this.fire = function() {
-		lastfire = now;
+		lastfire = world.time;
 		new FlyBullet(world, this.x, this.y, angle, this.player);
 		new FlySound(world, 0); // Firing sound
 	}
@@ -191,7 +193,7 @@ FlyPlane = function(_world, _x, _y, _player) {
 	this.receiveDamage = function(dmg) {
 		this.health -= dmg;
 		if(this.health <= 0) {
-			recovertime = now + recoverdelay;
+			recovertime = world.time + recoverdelay;
 		}
 	}
 	
@@ -227,11 +229,7 @@ FlyBullet = function(_world, _x, _y, _angle, _player) {
 	var angle = _angle;
 	var speed = 300; 			// pixels per second!
 	var lifeTime = 700;		// milliseconds before removal
-
-	var now = new Date().getTime();
-	var lasttic = now;
-	var endTime = now + lifeTime;
-
+	var endTime = world.time + lifeTime;
 
 	// public members
 	this.x = _x;
@@ -241,10 +239,7 @@ FlyBullet = function(_world, _x, _y, _angle, _player) {
 
 	// Quake-style think function :)
 	this.think = function() {
-
-		now = new Date().getTime();
-		var timedelta = (now - lasttic) * 0.001;
-		lasttic = now;
+		var timedelta = world.timedelta;
 
 		var x = this.x;
 		var y = this.y;
@@ -272,7 +267,7 @@ FlyBullet = function(_world, _x, _y, _angle, _player) {
 		}
 
 		// this bullet expired
-		if(now > endTime) {
+		if(world.time > endTime) {
 			world.remove(this);
 		}
 	}
