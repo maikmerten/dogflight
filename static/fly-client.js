@@ -1,7 +1,7 @@
 
 FlyRenderer = function(player, canvas) {
 	var that = this;
-	var vectrex = true;
+	var vectrex = false;
 	var scanlines = true;
 	var bgCanvas = $("<canvas>").attr("width", canvas.width).attr("height", canvas.height)[0];
 	var fgCanvas = $("<canvas>").attr("width", canvas.width).attr("height", canvas.height)[0];
@@ -56,7 +56,24 @@ FlyRenderer = function(player, canvas) {
 		ctx.save();
 		ctx.scale(2, 1);
 		ctx.beginPath();
-		ctx.arc(width * 0.32, height * 0.42, width * 0.06, 0, 2 * Math.PI, false);
+		ctx.arc(width * 0.47, height * 0.05, width * 0.04, 0, 2 * Math.PI, false);
+		ctx.restore();
+		ctx.fill();
+		ctx.stroke();
+
+
+		ctx.save();
+		ctx.scale(2, 1);
+		ctx.beginPath();
+		ctx.arc(width * 0.03, height * 0.95, width * 0.04, 0, 2 * Math.PI, false);
+		ctx.restore();
+		ctx.fill();
+		ctx.stroke();
+
+		ctx.save();
+		ctx.scale(2, 1);
+		ctx.beginPath();
+		ctx.arc(width * 0.35, height * 0.75, width * 0.04, 0, 2 * Math.PI, false);
 		ctx.restore();
 		ctx.fill();
 		ctx.stroke();
@@ -124,8 +141,7 @@ FlyRenderer = function(player, canvas) {
 		var sound = msg[1];
 		var audio = $("#sound" + sound);
 		if(audio[0]) {
-			var src = audio[0].src;
-			$("<audio>").attr("src", src).attr("autoplay",1);
+			audio[0].play();
 		}
 	}
 
