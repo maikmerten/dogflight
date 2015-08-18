@@ -100,10 +100,16 @@ io.on('connection', function(socket){
 		sendScores();
 	});
 
-	socket.on("controlUpdate", function(update) {
+	// control update
+	socket.on("ctrl", function(update) {
+		var dir = 0;
+		if(update & 1) dir = -1;
+		if(update & 2) dir = 1;
+		var fire = (update & 4);
+
 		var plane = socket.player.plane;
-		plane.setDir(update.d);
-		plane.setFire(update.f);
+		plane.setDir(dir);
+		plane.setFire(fire);
 	});
 
 

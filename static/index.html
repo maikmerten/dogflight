@@ -44,10 +44,7 @@ while(nick == null) {
 	nick = window.prompt("Nickname", "Nick");
 }
 
-var controlInfo = {
-	"d" : 0,
-	"f" : false
-}
+var controlCmd = 0;
 
 var dir = 0;
 canvas.mousemove(function(evt) {
@@ -118,11 +115,15 @@ $(document).keyup(function(evt) {
 function sendControl() {
 	if(!joined) return;
 
+	var cmd = 0;
+	if(dir != 0) {
+		cmd |= dir < 0 ? 1 : 2;
+	}
+	cmd |= fire ? 4 : 0;
 
-	if(controlInfo.d != dir || controlInfo.f != fire) {
-		controlInfo.d = dir;
-		controlInfo.f = fire;
-		socket.emit("controlUpdate", controlInfo);
+	if(controlCmd != cmd) {
+		socket.emit("ctrl", cmd);
+		controlCmd = cmd;
 	}
 }
 
