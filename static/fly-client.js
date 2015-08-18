@@ -2,9 +2,12 @@
 FlyRenderer = function(player, canvas) {
 	var that = this;
 	var vectrex = true;
+	var scanlines = true;
+	var bgCanvas = $("<canvas>").attr("width", canvas.width).attr("height", canvas.height)[0];
+	var fgCanvas = $("<canvas>").attr("width", canvas.width).attr("height", canvas.height)[0];
 
-	this.renderBackdrop = function() {
-		var ctx = canvas.getContext("2d");
+	this.prepareBackdrop = function() {
+		var ctx = bgCanvas.getContext("2d");
 
 		if(vectrex) {
 			ctx.fillStyle = "#000";
@@ -16,11 +19,17 @@ FlyRenderer = function(player, canvas) {
 		}
 		ctx.fillRect(0,0, canvas.width, canvas.height);
 	}
+	this.prepareBackdrop();
 
-	this.renderForeground = function() {
+	this.renderBackdrop = function() {
 		var ctx = canvas.getContext("2d");
-		var width = canvas.width;
-		var height = canvas.height;
+		ctx.drawImage(bgCanvas, 0, 0);
+	}
+
+	this.prepareForeground = function() {
+		var ctx = fgCanvas.getContext("2d");
+		var width = fgCanvas.width;
+		var height = fgCanvas.height;
 
 		ctx.lineWidth = vectrex ? 2 : 3;
 		ctx.strokeStyle = vectrex ? "#FFF" : "#CCC";
@@ -51,6 +60,18 @@ FlyRenderer = function(player, canvas) {
 		ctx.restore();
 		ctx.fill();
 		ctx.stroke();
+
+		for(var y = 0; scanlines && y < fgCanvas.height; ++y) {
+			var a = (y & 1) > 0 ? 0.0 : 0.4;
+			ctx.fillStyle = "rgba(0, 0, 0," + a + ")";
+			ctx.fillRect(0, y, fgCanvas.width, 1);
+		}
+	}
+	this.prepareForeground();
+
+	this.renderForeground = function() {
+		var ctx = canvas.getContext("2d");
+		ctx.drawImage(fgCanvas, 0, 0);
 	}
 
 	this.renderPlane = function(ctx, msg) {
