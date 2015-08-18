@@ -126,7 +126,14 @@ FlyPlane = function(_world, _x, _y, _player) {
 
 	var fire = false;
 	var lastfire = 0;			// time of firing last
-	var firedelay = 700;	
+	var firedelay = 700;
+
+	var boost = false;
+	var boostfuel = 100;
+	var boostrecovery = 10; 	// boost fuel recovered per second
+	var boostconsumption = 40;	// boost fuel consumed per second
+
+	var brake = false;
 
 	var recovertime = 0;
 	var recoverdelay = 1333;	
@@ -145,6 +152,23 @@ FlyPlane = function(_world, _x, _y, _player) {
 		var direction = dir;
 		var rotspeed = 0.6; 		// revolutions per two seconds!
 		var speed = 100; 			// pixels per second!
+
+		if(brake) {
+			speed -= 40;
+			rotspeed += 0.2;
+		}
+
+		if(boost) {
+			boostfuel -= boostconsumption * timedelta;
+			if(boostfuel > 0) {
+				speed += 75;
+				rotspeed += 0.2;
+			}
+		} else {
+			boostfuel += boostrecovery * timedelta;
+		}
+		boostfuel = Math.min(100, boostfuel);
+		boostfuel = Math.max(0, boostfuel);
 
 		// rotate if dead
 		if(this.health <= 0) {
@@ -208,6 +232,13 @@ FlyPlane = function(_world, _x, _y, _player) {
 		fire = newfire;
 	}
 
+	this.setBoost = function(newboost) {
+		boost = newboost;
+	}
+
+	this.setBrake = function(newbrake) {
+		brake = newbrake;
+	}
 	
 	this.getNetMsg = function() {
 		return [

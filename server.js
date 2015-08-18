@@ -106,10 +106,14 @@ io.on('connection', function(socket){
 		if(update & 1) dir = -1;
 		if(update & 2) dir = 1;
 		var fire = (update & 4);
+		var boost = (update & 8);
+		var brake = (update & 16);
 
 		var plane = socket.player.plane;
 		plane.setDir(dir);
 		plane.setFire(fire);
+		plane.setBoost(boost);
+		plane.setBrake(brake);
 	});
 
 

@@ -21,6 +21,9 @@
 	<h2>Controls</h2>
 	<span class="key">&#8592; Left</span>
 	<span class="key">&#8594; Right</span>
+	<span class="key">&#8593; Boost</span>
+	<span class="key">&#8595; Brake</span>
+	<br/><br/>
 	<span class="key">&nbsp;&nbsp;&nbsp; Space (Fire) &nbsp;&nbsp;&nbsp;</span>
 
 	<h2>Score</h2>
@@ -68,6 +71,8 @@ canvas.mousemove(function(evt) {
 });
 
 var fire = false;
+var boost = false;
+var brake = false;
 canvas.mousedown(function(evt) {
 	fire = true;
 	sendControl();
@@ -92,8 +97,16 @@ $(document).keydown(function(evt) {
 			dir = -1;
 			sendControl();
 			break;
-		case 39: // down
+		case 38: // up
+			boost = true;
+			sendControl();
+			break;
+		case 39: // right
 			dir = 1;
+			sendControl();
+			break;
+		case 40: // down
+			brake = true;
 			sendControl();
 			break;
 		default: return;
@@ -107,9 +120,17 @@ $(document).keyup(function(evt) {
 			fire = false;
 			sendControl();
 			break;
-		case 37: // up
-		case 39: // down
+		case 38:
+			boost = false;
+			sendControl();
+			break;
+		case 37: // left
+		case 39: // right
 			dir = 0;
+			sendControl();
+			break;
+		case 40: // down
+			brake = false;
 			sendControl();
 			break;
 		default: return;
@@ -126,6 +147,8 @@ function sendControl() {
 		cmd |= dir < 0 ? 1 : 2;
 	}
 	cmd |= fire ? 4 : 0;
+	cmd |= boost ? 8 : 0;
+	cmd |= brake ? 16 : 0;
 
 	if(controlCmd != cmd) {
 		socket.emit("ctrl", cmd);
