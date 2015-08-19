@@ -130,7 +130,14 @@ io.on('connection', function(socket){
 
 
 function tic() {
+	var oldtime = world.time;
 	world.think();
+	var newtime = world.time;
+
+	if(newtime - oldtime > 80) {
+		console.log("Warning: Server does not keep up, " + (newtime - oldtime) + " milliseconds between tics instead of 40!");
+	}
+
 	var msgs = world.getNetMsg();
 	io.sockets.in("players").emit("worldUpdate", msgs);
 }
