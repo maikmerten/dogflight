@@ -9,8 +9,8 @@ FlyRenderer = function(player, canvas) {
 	// try to init WebAudioSynth
 	var was = null;
 	try {
-		// four channels
-		was = new WebAudioSynth(4);
+		// three channels
+		was = new WebAudioSynth(3);
 		was.start();
 	} catch(e) {
 		console.log(e);
@@ -164,15 +164,10 @@ FlyRenderer = function(player, canvas) {
 
 	this.renderSoundFire = function() {
 		var voice2 = was.voices[2];
-		voice2.osc.init(voice2.osc.NOISE);
-		voice2.env.init(50,0.45,5,0.05,60,50)
-
-		var voice3 = was.voices[3];
-		voice3.osc.init(voice3.osc.TRIANGLE, 200);
-		voice3.env.init(10,1.0,20,0.5,10,10);
+		voice2.osc.init(voice2.osc.NOISE, 3000);
+		voice2.env.init(10,0.75,10,0.15,40,40)
 
 		voice2.env.release();
-		voice3.env.release();
 	}
 
 	this.renderSoundHit = function() {

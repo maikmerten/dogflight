@@ -41,8 +41,13 @@ WebAudioSynth = function(voicecount) {
 			return time < 0.5 ? 1.0 : -1.0;
 		}
 
+		var noisesample = 0.0;
+		var noisescale = 0.25;
 		var noise = function() {
-			return Math.random() * 2.0 - 1.0;
+			noisesample += (Math.random() * 2 - 1.0) * noisescale;
+			if(noisesample > 1.0) noisesample = 1.0;
+			if(noisesample < -1.0) noisesample = -1.0;
+			return noisesample;
 		}
 
 		var silence = function() {
@@ -67,13 +72,12 @@ WebAudioSynth = function(voicecount) {
 
 		var waveform = silence;
 		this.init = function(wform, frequency) {
-			var freq = 800;
-			if(frequency) {
-				freq = frequency;
-			}
 			time = 0.0;
 			waveform = waveforms[Math.min(waveforms.length - 1, Math.max(0, wform))];
-			incr = freq / samplerate;
+			incr = frequency / samplerate;
+			if(wform === this.NOISE) {
+				noisescale = frequency / 10000;
+			}
 
 		}
 
