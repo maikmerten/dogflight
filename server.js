@@ -102,12 +102,13 @@ io.on('connection', function(socket){
 
 	// control update
 	socket.on("ctrl", function(update) {
+
 		var dir = 0;
 		if(update & 1) dir = -1;
 		if(update & 2) dir = 1;
-		var fire = (update & 4);
-		var boost = (update & 8);
-		var brake = (update & 16);
+		var boost = (update & 4);
+		var brake = (update & 8);
+		var fire = (update & 16);
 
 		var plane = socket.player.plane;
 		plane.setDir(dir);
