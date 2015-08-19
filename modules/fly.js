@@ -295,6 +295,7 @@ FlyBullet = function(_world, _x, _y, _angle, _player) {
 		var other = world.findClosest(this, 20, 0);
 		if(other && other.player != this.player && other.health > 0) {
 			other.receiveDamage(200);
+			new FlySound(world, 1); // Hit sound
 			world.score(this.player, other.player);
 			world.remove(this);
 		}

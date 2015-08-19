@@ -6,6 +6,17 @@ FlyRenderer = function(player, canvas) {
 	var bgCanvas = $("<canvas>").attr("width", canvas.width).attr("height", canvas.height)[0];
 	var fgCanvas = $("<canvas>").attr("width", canvas.width).attr("height", canvas.height)[0];
 
+	// try to init WebAudioSynth
+	var was = null;
+	try {
+		// four channels
+		was = new WebAudioSynth(4);
+		was.start();
+	} catch(e) {
+		console.log(e);
+	}
+	
+
 	this.prepareBackdrop = function() {
 		var ctx = bgCanvas.getContext("2d");
 
@@ -138,11 +149,43 @@ FlyRenderer = function(player, canvas) {
 	}
 
 	this.renderSound = function(msg) {
+		if(!was) return;
 		var sound = msg[1];
-		var audio = $("#sound" + sound);
-		if(audio[0]) {
-			audio[0].play();
+		
+		switch(sound) {
+			case 0: // fire
+				this.renderSoundFire();
+				break;
+			case 1: // Hit
+				this.renderSoundHit();
+				break;
 		}
+	}
+
+	this.renderSoundFire = function() {
+		var voice2 = was.voices[2];
+		voice2.osc.init(voice2.osc.NOISE);
+		voice2.env.init(50,0.45,5,0.05,60,50)
+
+		var voice3 = was.voices[3];
+		voice3.osc.init(voice3.osc.TRIANGLE, 200);
+		voice3.env.init(10,1.0,20,0.5,10,10);
+
+		voice2.env.release();
+		voice3.env.release();
+	}
+
+	this.renderSoundHit = function() {
+		var voice0 = was.voices[0];
+		voice0.osc.init(voice0.osc.TRIANGLE, 500);
+		voice0.env.init(10,1.0,30,0.5,10,10);
+
+		var voice1 = was.voices[1];
+		voice1.osc.init(voice1.osc.TRIANGLE, 400);
+		voice1.env.init(10,1.0,30,0.5,10,10);
+
+		voice0.env.release();
+		voice1.env.release();
 	}
 
 	this.renderMsg = function(msg) {
