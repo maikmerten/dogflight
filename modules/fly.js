@@ -31,6 +31,7 @@ FlyWorld = function(_width, _height) {
 	}
 
 	this.findRadius = function(ent, radius, type) {
+		var radius_squared = radius * radius;
 		var result = [];
 		var x = ent.x;
 		var y = ent.y;
@@ -42,8 +43,8 @@ FlyWorld = function(_width, _height) {
 			}
 			var xdelta = x - e2.x;
 			var ydelta = y - e2.y;
-			var dist = Math.sqrt((xdelta*xdelta)+(ydelta*ydelta));
-			if(dist <= radius) {
+			var dist_squared = (xdelta*xdelta)+(ydelta*ydelta);
+			if(dist_squared <= radius_squared) {
 				result.push(e2);
 			}
 		}
@@ -52,8 +53,9 @@ FlyWorld = function(_width, _height) {
 	}
 
 	this.findClosest = function(ent, radius, type) {
+		var radius_squared = radius * radius;
 		var result = null;
-		var best = radius + 9;
+		var best = radius_squared + 9;
 		var x = ent.x;
 		var y = ent.y;
 
@@ -65,10 +67,10 @@ FlyWorld = function(_width, _height) {
 
 			var xdelta = x - e2.x;
 			var ydelta = y - e2.y;
-			var dist = Math.sqrt((xdelta*xdelta)+(ydelta*ydelta));
-			if(dist <= radius && dist < best) {
+			var dist_squared = (xdelta*xdelta)+(ydelta*ydelta);
+			if(dist_squared <= radius_squared && dist_squared < best) {
 				result = e2;
-				best = dist;
+				best = dist_squared;
 			}
 		}
 
