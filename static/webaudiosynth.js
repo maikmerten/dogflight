@@ -45,8 +45,7 @@ WebAudioSynth = function(voicecount) {
 		var noisescale = 0.25;
 		var noise = function() {
 			noisesample += (Math.random() * 2 - 1.0) * noisescale;
-			if(noisesample > 1.0) noisesample = 1.0;
-			if(noisesample < -1.0) noisesample = -1.0;
+			noisesample = Math.min(1.0, Math.max(-1.0, noisesample));
 			return noisesample;
 		}
 
