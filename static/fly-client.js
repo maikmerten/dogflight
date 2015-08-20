@@ -158,7 +158,7 @@ FlyRenderer = function(player, canvas) {
 		ctx.fill();
 		ctx.strokeStyle = vectrex? "#FFF" : "#000";
 		ctx.stroke();
-		ctx.fillStyle = vectrex? "#FFF" : "#000";
+		ctx.fillStyle = "#FFF";
 		ctx.fillRect(x - 2, y - 6, 4, 12);
 		ctx.fillRect(x - 6, y - 2, 12, 4);
 	}

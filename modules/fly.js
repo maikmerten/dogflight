@@ -426,16 +426,16 @@ FlyBonus = function(_world, _x, _y) {
 FlyBonusSpawner = function(_world) {
 	var world = _world;
 	world.add(this);
-	var nextspawn = world.time + 10000 + Math.random() * 10000;
+	var nextspawn = 0;
 
 	this.think = function() {
 		if(world.time < nextspawn) return;
+		nextspawn = world.time + 60000 + Math.random() * 60000;
 
 		// find planes
 		var planes = world.findType(0);
 		if(planes.length > 0) {
 			new FlyBonus(world, world.getWidth() * Math.random(), world.getHeight() * Math.random());
-			nextspawn = world.time + 10000 + Math.random() * 10000;
 		}
 	}
 }
