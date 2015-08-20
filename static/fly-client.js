@@ -148,6 +148,21 @@ FlyRenderer = function(player, canvas) {
 		ctx.fill();
 	}
 
+	this.renderBonus = function(ctx, msg) {
+		var x = msg[1];
+		var y = msg[2];
+
+		ctx.fillStyle = vectrex? "#000" : "#090";
+		ctx.beginPath();
+		ctx.arc(x, y, 10, 0, 2 * Math.PI, false);
+		ctx.fill();
+		ctx.strokeStyle = vectrex? "#FFF" : "#000";
+		ctx.stroke();
+		ctx.fillStyle = vectrex? "#FFF" : "#000";
+		ctx.fillRect(x - 2, y - 6, 4, 12);
+		ctx.fillRect(x - 6, y - 2, 12, 4);
+	}
+
 	this.renderSound = function(msg) {
 		if(!was) return;
 		var sound = msg[1];
@@ -197,8 +212,10 @@ FlyRenderer = function(player, canvas) {
 			case 2:
 				that.renderSound(msg);
 				break;
+			case 3:
+				that.renderBonus(ctx, msg);
+				break;
 		}
-
 	}
 
 	this.getPlayerColor = function(p) {

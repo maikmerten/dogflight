@@ -80,6 +80,18 @@ FlyWorld = function(_width, _height) {
 		return result;
 	}
 
+	this.findType = function(type) {
+		var result = [];
+		for(var i = 0; i < entities.length; ++i) {
+			var ent = entities[i];
+			if(ent.type === type) {
+				result.push(ent);
+			}
+		}
+
+		return result;
+	}
+
 	this.getNetMsg = function() {
 		var msg = [];
 		for(var i = 0; i < entities.length; ++i) {
@@ -115,8 +127,8 @@ FlyWorld = function(_width, _height) {
 		scoreCallback = callback;
 	}
 
-	this.score = function(player, other) {
-		scoreCallback(player, other);
+	this.score = function(points, player, other) {
+		scoreCallback(points, player, other);
 	}
 }
 
@@ -301,7 +313,7 @@ FlyBullet = function(_world, _x, _y, _angle, _player) {
 		if(other && other.player != this.player && other.health > 0) {
 			other.receiveDamage(200);
 			new FlySound(world, 1); // Hit sound
-			world.score(this.player, other.player);
+			world.score(1, this.player, other.player);
 			world.remove(this);
 		}
 
@@ -325,10 +337,11 @@ FlySound = function(_world, _sound) {
 	var that = this;
 	var world = _world;
 	world.add(this);
+	this.type = 2; // this is a sound effect
 	this.sound = _sound;
 
 	this.getNetMsg = function() {
-		var msg = [2, this.sound];
+		var msg = [this.type, this.sound];
 		world.remove(this);
 		return msg;
 	}
@@ -356,6 +369,78 @@ FlyBot = function(_world, _plane) {
 	}
 }
 
+FlyBonus = function(_world, _x, _y) {
+	var that = this;
+	var world = _world;
+	world.add(this);
+	var angle = Math.random() * 2.0;
+	var speed = 40;
+	var expiretime = world.time + 10000;
+
+	this.type = 3; // this is a bonus item
+	this.x = _x;
+	this.y = _y;
+
+	this.think = function() {
+		var timedelta = world.timedelta;
+
+		var x = this.x;
+		var y = this.y;
+		x += timedelta * (Math.cos(angle * Math.PI) * speed);
+		y += timedelta * (Math.sin(angle * Math.PI) * speed);
+
+		// clamp position to world dimensions
+		var width = world.getWidth();
+		var height = world.getHeight();
+		x = x < 0 ? x + width : x;
+		x = x > width ? x - width : x;
+
+		y = y < 0 ? y + height : y;
+		y = y > height ? y - height : y;
+
+		this.x = x;
+		this.y = y;
+
+		// find close planes!
+		var other = world.findClosest(this, 20, 0);
+		if(other && other.health > 0) {
+			world.score(5, other.player);
+			world.remove(this);
+		}
+
+		if(world.time > expiretime) {
+			world.remove(this);
+		}
+
+	}
+
+	this.getNetMsg = function() {
+		return [
+			(this.type|0),
+			(this.x|0),
+			(this.y|0)
+		];
+	}
+}
+
+FlyBonusSpawner = function(_world) {
+	var world = _world;
+	world.add(this);
+	var nextspawn = world.time + 10000 + Math.random() * 10000;
+
+	this.think = function() {
+		if(world.time < nextspawn) return;
+
+		// find planes
+		var planes = world.findType(0);
+		if(planes.length > 0) {
+			new FlyBonus(world, world.getWidth() * Math.random(), world.getHeight() * Math.random());
+			nextspawn = world.time + 10000 + Math.random() * 10000;
+		}
+	}
+}
+
+
 if(!module) {
 	var module = {};
 }
@@ -364,6 +449,8 @@ module.exports = {
 	"FlyWorld" : FlyWorld,
 	"FlyPlane" : FlyPlane,
 	"FlyBullet": FlyBullet,
+	"FlyBonus" : FlyBonus,
+	"FlyBonusSpawner" : FlyBonusSpawner,
 	"FlySound" : FlySound,
 	"FlyBot"   : FlyBot
 }

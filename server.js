@@ -30,7 +30,9 @@ app.get('/jquery.js', function(req, res){
 });
 
 var minplayercount = 3;
-var world = new fly.FlyWorld(640,480);
+var world = new fly.FlyWorld(640,480);	// spawn world
+new fly.FlyBonusSpawner(world);			// add spawner for bonus items
+
 var players = [];
 function Player(player) {
 	players[player] = this;
@@ -145,11 +147,11 @@ function ensurePlayerCount(cnt) {
 }
 
 
-world.setScoreCallback(function(player, other) {
+world.setScoreCallback(function(points, player, other) {
 	var p = players[player];
 	var o = players[other];
 	if(p) {
-		p.score++;
+		p.score += points;
 		console.log("new score for " + p.nick + ": " + p.score);
 	}
 	sendScores();
