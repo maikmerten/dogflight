@@ -25,11 +25,14 @@
 	<span class="key">&#8595; Brake</span>
 	<br/><br/>
 	<span class="key">&nbsp;&nbsp;&nbsp; Space (Fire) &nbsp;&nbsp;&nbsp;</span>
+	<br/><br/>
+<input type="checkbox" checked="true" onchange="renderer.setColors(this.checked == true);">Colours enabled</input>
 
 	<h2>Score</h2>
 	<ul id="scores"></ul>
 
 </div>
+
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/jquery.js"></script>

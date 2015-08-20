@@ -1,7 +1,7 @@
 
 FlyRenderer = function(player, canvas) {
 	var that = this;
-	var vectrex = false;
+	var nocolors = false;
 	var scanlines = true;
 	var bgCanvas = $("<canvas>").attr("width", canvas.width).attr("height", canvas.height)[0];
 	var fgCanvas = $("<canvas>").attr("width", canvas.width).attr("height", canvas.height)[0];
@@ -16,11 +16,16 @@ FlyRenderer = function(player, canvas) {
 		console.log(e);
 	}
 	
+	this.setColors = function(colors) {
+		nocolors = !colors;
+		this.prepareBackdrop();
+		this.prepareForeground();
+	}
 
 	this.prepareBackdrop = function() {
 		var ctx = bgCanvas.getContext("2d");
 
-		if(vectrex) {
+		if(nocolors) {
 			ctx.fillStyle = "#000";
 		} else {
 			var grd = ctx.createLinearGradient(0, 0, 0, canvas.height);
@@ -42,9 +47,11 @@ FlyRenderer = function(player, canvas) {
 		var width = fgCanvas.width;
 		var height = fgCanvas.height;
 
-		ctx.lineWidth = vectrex ? 2 : 3;
-		ctx.strokeStyle = vectrex ? "#FFF" : "#CCC";
-		ctx.fillStyle = vectrex ? "#000" : "#FFF";
+		ctx.clearRect(0,0, canvas.width, canvas.height);
+
+		ctx.lineWidth = nocolors ? 2 : 3;
+		ctx.strokeStyle = nocolors ? "#FFF" : "#CCC";
+		ctx.fillStyle = nocolors ? "#000" : "#FFF";
 
 		// cloud
 		ctx.save();
@@ -120,7 +127,7 @@ FlyRenderer = function(player, canvas) {
 		var x_wing_r = x + (Math.cos(angle_wing_r) * 10);
 		var y_wing_r = y + (Math.sin(angle_wing_r) * 10);
 
-		if(vectrex) {
+		if(nocolors) {
 			ctx.fillStyle = (p === player) ? "#FFF" : "#000";
 		} else {
 			ctx.fillStyle = this.getPlayerColor(p);
@@ -134,7 +141,7 @@ FlyRenderer = function(player, canvas) {
 		ctx.closePath();
 		ctx.fill();
 		ctx.lineWidth = 2;
-		ctx.strokeStyle = vectrex? "#FFF" : "#000";
+		ctx.strokeStyle = nocolors? "#FFF" : "#000";
 		ctx.stroke();
 	}
 
@@ -142,7 +149,7 @@ FlyRenderer = function(player, canvas) {
 		var x = msg[1];
 		var y = msg[2];
 
-		ctx.fillStyle = vectrex? "#FFF" : "#000";
+		ctx.fillStyle = nocolors? "#FFF" : "#000";
 		ctx.beginPath();
 		ctx.arc(x, y, 2, 0, 2 * Math.PI, false);
 		ctx.fill();
@@ -152,11 +159,11 @@ FlyRenderer = function(player, canvas) {
 		var x = msg[1];
 		var y = msg[2];
 
-		ctx.fillStyle = vectrex? "#000" : "#090";
+		ctx.fillStyle = nocolors? "#000" : "#090";
 		ctx.beginPath();
 		ctx.arc(x, y, 10, 0, 2 * Math.PI, false);
 		ctx.fill();
-		ctx.strokeStyle = vectrex? "#FFF" : "#000";
+		ctx.strokeStyle = nocolors? "#FFF" : "#000";
 		ctx.stroke();
 		ctx.fillStyle = "#FFF";
 		ctx.fillRect(x - 2, y - 6, 4, 12);
