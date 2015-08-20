@@ -11,6 +11,13 @@
 var was = new WebAudioSynth(4);
 was.start();
 
+function envelopetest() {
+	var voice0 = was.voices[0];
+	voice0.osc.init(voice0.osc.SINE, 500);
+	voice0.env.init(1000,1.0,1000,0.5,1000,1000);
+	voice0.env.release();
+}
+
 function hit() {
 	var voice0 = was.voices[0];
 	voice0.osc.init(voice0.osc.TRIANGLE, 500);
@@ -59,7 +66,7 @@ function bonusspawn() {
 
 
 </script>
-
+<button onClick="envelopetest()">Test envelope</button>
 <button onClick="fire()">Fire</button>
 <button onClick="hit()">Hit</button>
 <button onClick="noise()">Noise</button>

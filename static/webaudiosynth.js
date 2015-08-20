@@ -113,6 +113,8 @@ WebAudioSynth = function(voicecount) {
 		this.released = false;
 		this.repeat = 1;
 
+		this.phase = 0;
+
 		this.init = function(atime, alevel, dtime, dlevel, stime, rtime, repeat) {
 			// times in milliseconds!
 			var attack= Math.floor(atime * 0.001 * samplerate);
@@ -138,8 +140,8 @@ WebAudioSynth = function(voicecount) {
 			this.reset();
 		}
 
-
 		this.reset = function() {
+			this.phase = 0;
 			this.volume = 0.0;
 			this.sample = 0;
 			this.released = false;
@@ -152,28 +154,25 @@ WebAudioSynth = function(voicecount) {
 		this.getEnvelope = function() {
 			if(!this.released) return 0.0;
 
-
-			var phase = (0|0);
-			phase |= this.sample < this.attackend ? 1 : 0;
-			phase |= this.sample < this.decayend ? 2 : 0;
-			phase |= this.sample < this.sustainend ? 4 : 0;
-			phase |= this.sample < this.releaseend ? 8 : 0;
-
-			switch(phase) {
-				case 15: // attack
+			switch(this.phase) {
+				case 0: // attack
 					this.volume += this.attackstp;
 					this.sample++;
+					if(this.sample > this.attackend) this.phase++;
 					break;
-				case 14: // decay
+				case 1: // decay
 					this.volume += this.decaystp;
 					this.sample++;
+					if(this.sample > this.decayend) this.phase++;
 					break;
-				case 12: // sustain
+				case 2: // sustain
 					this.sample++;
+					if(this.sample > this.sustainend) this.phase++;
 					break;
-				case 8: // release
+				case 3: // release
 					this.volume += this.releasestp;
 					this.sample++;
+					if(this.sample > this.releaseend) this.phase++;
 					break;
 				default:
 					this.volume = 0.0;
