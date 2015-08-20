@@ -29,7 +29,7 @@ app.get('/jquery.js', function(req, res){
 	res.sendFile(__dirname + '/static/jquery-1.11.1' + minjs + '.js');
 });
 
-
+var minplayercount = 3;
 var world = new fly.FlyWorld(640,480);
 var players = [];
 function Player(player) {
@@ -70,6 +70,81 @@ function sendScores() {
 	io.sockets.in("players").emit("scores", update);
 }
 
+function getHumanPlayerCount() {
+	var cnt = 0;
+	for(var i = 0; i < players.length; ++i) {
+		var player = players[i];
+		if(player != null && !("bot" in player)) {
+			cnt++;
+		}
+	}
+	return cnt;
+}
+
+function getBotPlayerCount() {
+	var cnt = 0;
+	for(var i = 0; i < players.length; ++i) {
+		var player = players[i];
+		if(player != null && ("bot" in player)) {
+			cnt++;
+		}
+	}
+	return cnt;
+}
+
+function getPlayerCount() {
+	return getHumanPlayerCount() + getBotPlayerCount();
+}
+
+function addBot() {
+	console.log("Adding bot player");
+	var player = new Player(nextPlayer());
+	player.nick = "DogBot" + Math.floor(Math.random() * 99);
+	player.bot = 1;
+
+	var bot = new fly.FlyBot(world, player.plane);
+
+	sendScores();	
+}
+
+function removeBot() {
+	console.log("Removing bot player");
+	var botplayer = null;
+
+	for(var i = 0; i < players.length; ++i) {
+		var player = players[i];
+		if(player != null && "bot" in player) {
+			botplayer = player;
+			break;
+		}
+	}
+
+	if(botplayer != null) {
+		players[botplayer.player] = null;
+		world.remove(botplayer.plane);
+		sendScores();
+	}
+
+}
+
+function ensurePlayerCount(cnt) {
+	if(getHumanPlayerCount() == 0) {
+		while(getBotPlayerCount() > 0) {
+			removeBot();
+		}
+		return;
+	}
+
+	while(getPlayerCount() < cnt) {
+		addBot();
+	}
+
+	while(getPlayerCount() > cnt && getBotPlayerCount() > 0) {
+		removeBot();
+	}
+}
+
+
 world.setScoreCallback(function(player, other) {
 	var p = players[player];
 	var o = players[other];
@@ -98,6 +173,7 @@ io.on('connection', function(socket){
 		}
 		socket.emit("joinInfo", joininfo);
 		sendScores();
+		ensurePlayerCount(minplayercount);
 	});
 
 	// control update
@@ -125,6 +201,7 @@ io.on('connection', function(socket){
 			players[socket.player.player] = null;
 		}
 		sendScores();
+		ensurePlayerCount(minplayercount);
 	});
 });
 

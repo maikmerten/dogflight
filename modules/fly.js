@@ -26,7 +26,10 @@ FlyWorld = function(_width, _height) {
 
 		// ensure all remaining entities think
 		for(var i = 0; i < entities.length; ++i) {
-			entities[i].think();
+			var ent = entities[i];
+			if("think" in ent) {
+				entities[i].think();
+			}
 		}
 	}
 
@@ -81,7 +84,9 @@ FlyWorld = function(_width, _height) {
 		var msg = [];
 		for(var i = 0; i < entities.length; ++i) {
 			var ent = entities[i];
-			msg.push(ent.getNetMsg());
+			if("getNetMsg" in ent) {
+				msg.push(ent.getNetMsg());
+			}
 		}
 		return msg;
 	}
@@ -322,12 +327,32 @@ FlySound = function(_world, _sound) {
 	world.add(this);
 	this.sound = _sound;
 
-	this.think = function(){};
-
 	this.getNetMsg = function() {
 		var msg = [2, this.sound];
 		world.remove(this);
 		return msg;
+	}
+}
+
+FlyBot = function(_world, _plane) {
+	var that = this;
+	var world = _world;
+	var plane = _plane;
+	world.add(this);
+
+	var nextTurn = world.time;
+
+	this.think = function() {
+		if(world.time < nextTurn) return;
+
+		var r = Math.random();
+		var dir = 0;
+		if(r < 0.3) dir = 1;
+		if(r > 0.7) dir = -1;
+
+		plane.setDir(dir);
+
+		nextTurn = world.time + (Math.random() * 2000);
 	}
 }
 
@@ -339,5 +364,6 @@ module.exports = {
 	"FlyWorld" : FlyWorld,
 	"FlyPlane" : FlyPlane,
 	"FlyBullet": FlyBullet,
-	"FlySound" : FlySound
+	"FlySound" : FlySound,
+	"FlyBot"   : FlyBot
 }
