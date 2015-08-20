@@ -170,19 +170,7 @@ FlyRenderer = function(player, canvas) {
 		ctx.fillRect(x - 6, y - 2, 12, 4);
 	}
 
-	this.renderSound = function(msg) {
-		if(!was) return;
-		var sound = msg[1];
-		
-		switch(sound) {
-			case 0: // fire
-				this.renderSoundFire();
-				break;
-			case 1: // Hit
-				this.renderSoundHit();
-				break;
-		}
-	}
+
 
 	this.renderSoundFire = function() {
 		var voice2 = was.voices[2];
@@ -203,6 +191,30 @@ FlyRenderer = function(player, canvas) {
 
 		voice0.env.release();
 		voice1.env.release();
+	}
+
+	this.renderSoundBonusSpawn = function() {
+		var voice0 = was.voices[0];
+		voice0.osc.init(voice0.osc.TRIANGLE, 600);
+		voice0.env.init(10,0.7,80,0.35,10,10, 5);
+		voice0.env.release();
+	}
+
+	this.renderSound = function(msg) {
+		if(!was) return;
+		var sound = msg[1];
+		
+		switch(sound) {
+			case 0: // fire
+				this.renderSoundFire();
+				break;
+			case 1: // Hit
+				this.renderSoundHit();
+				break;
+			case 2: // Bonus spawn
+				this.renderSoundBonusSpawn();
+				break;
+		}
 	}
 
 	this.renderMsg = function(msg) {

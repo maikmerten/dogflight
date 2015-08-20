@@ -436,6 +436,7 @@ FlyBonusSpawner = function(_world) {
 		var planes = world.findType(0);
 		if(planes.length > 0) {
 			new FlyBonus(world, world.getWidth() * Math.random(), world.getHeight() * Math.random());
+			new FlySound(world, 2); // Bonus spawn sound
 		}
 	}
 }
