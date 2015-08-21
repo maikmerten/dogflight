@@ -113,19 +113,19 @@ FlyRenderer = function(player, canvas) {
 		var p = msg[1];
 		var x = msg[2];
 		var y = msg[3];
-		var angle = msg[4] * 0.0025 * Math.PI;
+		var angle = msg[4] * 0.005;
 
-		var x_tip = x + (Math.cos(angle) * 12);
-		var y_tip = y + (Math.sin(angle) * 12);
+		var x_tip = x + (Math.sin(angle) * 12);
+		var y_tip = y - (Math.cos(angle) * 12);
 
 		var wingslant = 0.7 * Math.PI;
 		var angle_wing_l = angle - wingslant;
-		var x_wing_l = x + (Math.cos(angle_wing_l) * 10);
-		var y_wing_l = y + (Math.sin(angle_wing_l) * 10);
+		var x_wing_l = x + (Math.sin(angle_wing_l) * 10);
+		var y_wing_l = y - (Math.cos(angle_wing_l) * 10);
 
 		var angle_wing_r = angle + wingslant;
-		var x_wing_r = x + (Math.cos(angle_wing_r) * 10);
-		var y_wing_r = y + (Math.sin(angle_wing_r) * 10);
+		var x_wing_r = x + (Math.sin(angle_wing_r) * 10);
+		var y_wing_r = y - (Math.cos(angle_wing_r) * 10);
 
 		if(nocolors) {
 			ctx.fillStyle = (p === player) ? "#FFF" : "#000";

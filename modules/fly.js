@@ -140,8 +140,9 @@ FlyPlane = function(_world, _x, _y, _player) {
 	var world = _world;
 	world.add(this);
 
-	var angle = 0.0; 			// plane is horizontal, flies right ->
-	var dir = 1;				// -1: turn counter-clockwise, 0: don't turn, 1: turn clockwise
+	var angle = 0; 			// plane is horizontal, flies right ->
+	this.angle = angle;
+	var dir = 0;				// -1: turn counter-clockwise, 0: don't turn, 1: turn clockwise
 
 	var fire = false;
 	var lastfire = 0;			// time of firing last
@@ -169,19 +170,19 @@ FlyPlane = function(_world, _x, _y, _player) {
 		var timedelta = world.timedelta;
 
 		var direction = dir;
-		var rotspeed = 0.6; 		// revolutions per two seconds!
+		var rotspeed = 1.9;
 		var speed = 100; 			// pixels per second!
 
 		if(brake) {
 			speed -= 40;
-			rotspeed += 0.2;
+			rotspeed *= 1.2;
 		}
 
 		if(boost) {
 			boostfuel -= boostconsumption * timedelta;
 			if(boostfuel > 0) {
 				speed += 75;
-				rotspeed += 0.2;
+				rotspeed *= 1.2;
 			}
 		} else {
 			boostfuel += boostrecovery * timedelta;
@@ -192,7 +193,7 @@ FlyPlane = function(_world, _x, _y, _player) {
 		// rotate if dead
 		if(this.health <= 0) {
 			direction = 1;
-			rotspeed = 5;
+			rotspeed = 15;
 			speed = 0;
 			if(world.time > recovertime) {
 				this.health = 100;
@@ -201,13 +202,14 @@ FlyPlane = function(_world, _x, _y, _player) {
 
 		// update angle
 		angle += direction * (rotspeed * timedelta);
-		angle = angle < 0 ? angle + 2.0 : angle;
-		angle = angle > 2 ? angle - 2.0 : angle;
+		angle = angle < -Math.PI ? angle + (2 * Math.PI) : angle;
+		angle = angle > Math.PI ? angle - (2 * Math.PI) : angle;
+		this.angle = angle;
 
 		var x = this.x;
 		var y = this.y;
-		x += timedelta * (Math.cos(angle * Math.PI) * speed);
-		y += timedelta * (Math.sin(angle * Math.PI) * speed);
+		x += timedelta * (Math.sin(angle) * speed);
+		y -= timedelta * (Math.cos(angle) * speed);
 
 		// clamp position to world dimensions
 		var width = world.getWidth();
@@ -265,7 +267,7 @@ FlyPlane = function(_world, _x, _y, _player) {
 			(this.player|0),
 			(this.x|0),
 			(this.y|0),
-			((angle * 400)|0)
+			((angle * 200)|0)
 		];
 	}
 }
@@ -293,8 +295,8 @@ FlyBullet = function(_world, _x, _y, _angle, _player) {
 
 		var x = this.x;
 		var y = this.y;
-		x += timedelta * (Math.cos(angle * Math.PI) * speed);
-		y += timedelta * (Math.sin(angle * Math.PI) * speed);
+		x += timedelta * (Math.sin(angle) * speed);
+		y -= timedelta * (Math.cos(angle) * speed);
 
 		// clamp position to world dimensions
 		var width = world.getWidth();
@@ -344,28 +346,6 @@ FlySound = function(_world, _sound) {
 		var msg = [this.type, this.sound];
 		world.remove(this);
 		return msg;
-	}
-}
-
-FlyBot = function(_world, _plane) {
-	var that = this;
-	var world = _world;
-	var plane = _plane;
-	world.add(this);
-
-	var nextTurn = world.time;
-
-	this.think = function() {
-		if(world.time < nextTurn) return;
-
-		var r = Math.random();
-		var dir = 0;
-		if(r < 0.3) dir = 1;
-		if(r > 0.7) dir = -1;
-
-		plane.setDir(dir);
-
-		nextTurn = world.time + (Math.random() * 2000);
 	}
 }
 
@@ -442,6 +422,40 @@ FlyBonusSpawner = function(_world) {
 	}
 }
 
+FlyBot = function(_world, _plane) {
+	var that = this;
+	var world = _world;
+	var plane = _plane;
+	world.add(this);
+
+	var nextTurn = world.time;
+	var nextTarget = world.time;
+
+	this.think = function() {
+		if(world.time > nextTarget) {
+			// find close plane
+			var target = world.findClosest(plane, 200, 0);
+			if(target) {
+
+			} else {
+				plane.setFire(false);
+			}
+
+		}
+
+		if(world.time > nextTurn) {
+			var r = Math.random();
+			var dir = 0;
+			if(r < 0.3) {
+				dir = 1;
+			} else if(r > 0.7) {
+				dir = -1;
+			}
+			plane.setDir(dir);
+			nextTurn = world.time + (Math.random() * 2000);
+		}
+	}
+}
 
 if(!module) {
 	var module = {};
