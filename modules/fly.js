@@ -366,8 +366,8 @@ FlyBonus = function(_world, _x, _y) {
 
 		var x = this.x;
 		var y = this.y;
-		x += timedelta * (Math.cos(angle * Math.PI) * speed);
-		y += timedelta * (Math.sin(angle * Math.PI) * speed);
+		x += timedelta * (Math.cos(angle) * speed);
+		y -= timedelta * (Math.sin(angle) * speed);
 
 		// clamp position to world dimensions
 		var width = world.getWidth();
