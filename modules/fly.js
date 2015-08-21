@@ -405,6 +405,7 @@ FlyBonus = function(_world, _x, _y) {
 		var other = world.findClosest(this, 20, 0);
 		if(other && other.health > 0) {
 			world.score(5, other.player);
+			new FlySound(world, 3); // Bonus pickup
 			world.remove(this);
 		}
 
@@ -430,7 +431,7 @@ FlyBonusSpawner = function(_world) {
 
 	this.think = function() {
 		if(world.time < nextspawn) return;
-		nextspawn = world.time + 60000 + Math.random() * 60000;
+		nextspawn = world.time + 30000 + Math.random() * 60000;
 
 		// find planes
 		var planes = world.findType(0);

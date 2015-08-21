@@ -200,6 +200,13 @@ FlyRenderer = function(player, canvas) {
 		voice0.env.release();
 	}
 
+	this.renderSoundBonusPickup = function() {
+		var voice0 = was.voices[0];
+		voice0.osc.init(voice0.osc.TRIANGLE, 600);
+		voice0.env.init(30,0.7,40,0.35,10,50);
+		voice0.env.release();
+	}
+
 	this.renderSound = function(msg) {
 		if(!was) return;
 		var sound = msg[1];
@@ -213,6 +220,9 @@ FlyRenderer = function(player, canvas) {
 				break;
 			case 2: // Bonus spawn
 				this.renderSoundBonusSpawn();
+				break;
+			case 3: // Bonus pickup
+				this.renderSoundBonusPickup();
 				break;
 		}
 	}

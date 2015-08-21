@@ -64,6 +64,12 @@ function bonusspawn() {
 	voice0.env.release();
 }
 
+function bonuspickup() {
+	var voice0 = was.voices[0];
+	voice0.osc.init(voice0.osc.TRIANGLE, 600);
+	voice0.env.init(30,0.7,40,0.35,10,50);
+	voice0.env.release();
+}
 
 </script>
 <button onClick="envelopetest()">Test envelope</button>
@@ -72,5 +78,6 @@ function bonusspawn() {
 <button onClick="noise()">Noise</button>
 <button onClick="choplifter()">Choplifter</button>
 <button onClick="bonusspawn()">Bonus spawn</button>
+<button onClick="bonuspickup()">Bonus pickup</button>
 </body>
 </html>
