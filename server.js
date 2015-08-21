@@ -182,8 +182,8 @@ io.on('connection', function(socket){
 	socket.on("ctrl", function(update) {
 
 		var dir = 0;
-		if(update & 1) dir = -1;
-		if(update & 2) dir = 1;
+		if(update & 1) dir = 1;
+		if(update & 2) dir = -1;
 		var boost = (update & 4);
 		var brake = (update & 8);
 		var fire = (update & 16);

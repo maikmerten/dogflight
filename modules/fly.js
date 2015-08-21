@@ -140,9 +140,9 @@ FlyPlane = function(_world, _x, _y, _player) {
 	var world = _world;
 	world.add(this);
 
-	var angle = 0; 			// plane is horizontal, flies right ->
+	var angle = 0;	 			// plane is horizontal, flies right ->
 	this.angle = angle;
-	var dir = 0;				// -1: turn counter-clockwise, 0: don't turn, 1: turn clockwise
+	var dir = 0;				// 1: turn counter-clockwise, 0: don't turn, -1: turn clockwise
 
 	var fire = false;
 	var lastfire = 0;			// time of firing last
@@ -208,8 +208,8 @@ FlyPlane = function(_world, _x, _y, _player) {
 
 		var x = this.x;
 		var y = this.y;
-		x += timedelta * (Math.sin(angle) * speed);
-		y -= timedelta * (Math.cos(angle) * speed);
+		x += timedelta * (Math.cos(angle) * speed);
+		y -= timedelta * (Math.sin(angle) * speed);
 
 		// clamp position to world dimensions
 		var width = world.getWidth();
@@ -279,7 +279,7 @@ FlyBullet = function(_world, _x, _y, _angle, _player) {
 	world.add(this);
 
 	var angle = _angle;
-	var speed = 300; 			// pixels per second!
+	var speed = 300; 		// pixels per second!
 	var lifeTime = 700;		// milliseconds before removal
 	var endTime = world.time + lifeTime;
 
@@ -295,8 +295,8 @@ FlyBullet = function(_world, _x, _y, _angle, _player) {
 
 		var x = this.x;
 		var y = this.y;
-		x += timedelta * (Math.sin(angle) * speed);
-		y -= timedelta * (Math.cos(angle) * speed);
+		x += timedelta * (Math.cos(angle) * speed);
+		y -= timedelta * (Math.sin(angle) * speed);
 
 		// clamp position to world dimensions
 		var width = world.getWidth();
@@ -436,7 +436,8 @@ FlyBot = function(_world, _plane) {
 			// find close plane
 			var target = world.findClosest(plane, 200, 0);
 			if(target) {
-				var angle2 = Math.atan2(target.x - plane.x, target.y - plane.y);
+				// Arguments for Math.atan2 are "backwards": atan2(y, x)!
+				var angle2 = Math.atan2(target.y - plane.y, target.x - plane.x)
 				var diff = Math.abs(plane.angle - angle2);
 				plane.setFire(diff < 1.0);
 			} else {
