@@ -436,11 +436,13 @@ FlyBot = function(_world, _plane) {
 			// find close plane
 			var target = world.findClosest(plane, 200, 0);
 			if(target) {
-
+				var angle2 = Math.atan2(target.x - plane.x, target.y - plane.y);
+				var diff = Math.abs(plane.angle - angle2);
+				plane.setFire(diff < 1.0);
 			} else {
 				plane.setFire(false);
 			}
-
+			nextTarget = world.time + 100;
 		}
 
 		if(world.time > nextTurn) {
