@@ -159,7 +159,10 @@ FlyPlane = function(_world, _x, _y, _player) {
 	var recoverdelay = 1333;
 
 	var multishottime = 0;
-	var multishotduration = 10000;
+	var multishotduration = 15000;
+
+	var rapidfiretime = 0;
+	var rapidfireduration = 20000;
 
 	// public members
 	this.health = 100;
@@ -226,8 +229,10 @@ FlyPlane = function(_world, _x, _y, _player) {
 		this.x = x;
 		this.y = y;
 
+		var rapidfire = world.time < rapidfiretime;
+
 		// fire if ready
-		if(fire && this.health > 0 && world.time > lastfire + firedelay) {
+		if(fire && this.health > 0 && world.time > lastfire + (firedelay * (rapidfire ? 0.33 : 1.0))) {
 			this.fire();
 		}
 	}
@@ -271,6 +276,10 @@ FlyPlane = function(_world, _x, _y, _player) {
 
 	this.enableMultiShot = function() {
 		multishottime = world.time + multishotduration;
+	}
+
+	this.enableRapidFire = function() {
+		rapidfiretime = world.time + rapidfireduration;
 	}
 	
 	this.getNetMsg = function() {
@@ -396,8 +405,11 @@ FlyBonus = function(_world, _x, _y) {
 		// find close planes!
 		var other = world.findClosest(this, 20, 0);
 		if(other && other.health > 0) {
-			if(Math.random() < 0.5) {
+			var r = Math.random();
+			if(r < 0.33) {
 				other.enableMultiShot();
+			} else if(r < 0.66) {
+				other.enableRapidFire();
 			} else {
 				world.score(5, other.player);
 			}
@@ -427,7 +439,7 @@ FlyBonusSpawner = function(_world) {
 
 	this.think = function() {
 		if(world.time < nextspawn) return;
-		nextspawn = world.time + 30000 + Math.random() * 60000;
+		nextspawn = world.time + 15000 + Math.random() * 45000;
 
 		// find planes
 		var planes = world.findType(0);
