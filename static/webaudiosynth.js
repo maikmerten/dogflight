@@ -100,14 +100,14 @@ WebAudioSynth = function(voicecount) {
 		this.attackstp = 0.0;	// attack step per sample
 
 		this.decacend = 0;		// end of decay phase
-		this.decaystp = 0.0;		// decay step per sample
+		this.decaystp = 0.0;	// decay step per sample
 
-		this.sustainend = 0;		// end of sustain phase
+		this.sustainend = 0;	// end of sustain phase
 
-		this.releaseend = 0;		// end of release phase
+		this.releaseend = 0;	// end of release phase
 		this.releasestp = 0.0;	// release step per sample
 
-		this.sample = 0;			// sample counter
+		this.sample = 0;		// sample counter
 		this.volume = 0.0;		// current volume of envelope
 
 		this.released = false;
@@ -158,21 +158,21 @@ WebAudioSynth = function(voicecount) {
 				case 0: // attack
 					this.volume += this.attackstp;
 					this.sample++;
-					if(this.sample > this.attackend) this.phase++;
+					if(this.sample > this.attackend) this.phase = 1;
 					break;
 				case 1: // decay
 					this.volume += this.decaystp;
 					this.sample++;
-					if(this.sample > this.decayend) this.phase++;
+					if(this.sample > this.decayend) this.phase = 2;
 					break;
 				case 2: // sustain
 					this.sample++;
-					if(this.sample > this.sustainend) this.phase++;
+					if(this.sample > this.sustainend) this.phase = 3;
 					break;
 				case 3: // release
 					this.volume += this.releasestp;
 					this.sample++;
-					if(this.sample > this.releaseend) this.phase++;
+					if(this.sample > this.releaseend) this.phase = 4;
 					break;
 				default:
 					this.volume = 0.0;
@@ -181,12 +181,9 @@ WebAudioSynth = function(voicecount) {
 						this.released = true;
 						this.repeat--;
 					}
-
 			}
-
 			return this.volume;
 		}
-
 	}
 
 
