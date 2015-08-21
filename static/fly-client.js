@@ -5,6 +5,11 @@ FlyRenderer = function(player, canvas) {
 	var scanlines = true;
 	var bgCanvas = $("<canvas>").attr("width", canvas.width).attr("height", canvas.height)[0];
 	var fgCanvas = $("<canvas>").attr("width", canvas.width).attr("height", canvas.height)[0];
+	var lineCanvas = $("<canvas>").attr("width", canvas.width).attr("height", canvas.height)[0];
+	var cursorCanvas = $("<canvas>").attr("width", 32).attr("height", 32)[0];
+
+	var player_x = 0;
+	var player_y = 0;
 
 	// try to init WebAudioSynth
 	var was = null;
@@ -20,6 +25,7 @@ FlyRenderer = function(player, canvas) {
 		nocolors = !colors;
 		this.prepareBackdrop();
 		this.prepareForeground();
+		this.prepareCursor();
 	}
 
 	this.prepareBackdrop = function() {
@@ -37,8 +43,7 @@ FlyRenderer = function(player, canvas) {
 	}
 	this.prepareBackdrop();
 
-	this.renderBackdrop = function() {
-		var ctx = canvas.getContext("2d");
+	this.renderBackdrop = function(ctx) {
 		ctx.drawImage(bgCanvas, 0, 0);
 	}
 
@@ -47,7 +52,7 @@ FlyRenderer = function(player, canvas) {
 		var width = fgCanvas.width;
 		var height = fgCanvas.height;
 
-		ctx.clearRect(0,0, canvas.width, canvas.height);
+		ctx.clearRect(0,0, fgCanvas.width, fgCanvas.height);
 
 		ctx.lineWidth = nocolors ? 2 : 3;
 		ctx.strokeStyle = nocolors ? "#FFF" : "#CCC";
@@ -79,7 +84,6 @@ FlyRenderer = function(player, canvas) {
 		ctx.fill();
 		ctx.stroke();
 
-
 		ctx.save();
 		ctx.scale(2, 1);
 		ctx.beginPath();
@@ -95,25 +99,60 @@ FlyRenderer = function(player, canvas) {
 		ctx.restore();
 		ctx.fill();
 		ctx.stroke();
-
-		for(var y = 0; scanlines && y < fgCanvas.height; ++y) {
-			var a = (y & 1) > 0 ? 0.0 : 0.4;
-			ctx.fillStyle = "rgba(0, 0, 0," + a + ")";
-			ctx.fillRect(0, y, fgCanvas.width, 1);
-		}
 	}
 	this.prepareForeground();
 
-	this.renderForeground = function() {
-		var ctx = canvas.getContext("2d");
+	this.renderForeground = function(ctx) {
 		ctx.drawImage(fgCanvas, 0, 0);
 	}
+
+	this.prepareScanlines = function() {
+		var ctx = lineCanvas.getContext("2d");
+		ctx.clearRect(0,0, lineCanvas.width, lineCanvas.height);
+		for(var y = 0; y < lineCanvas.height; ++y) {
+			var a = (y & 1) > 0 ? 0.0 : 0.4;
+			ctx.fillStyle = "rgba(0, 0, 0," + a + ")";
+			ctx.fillRect(0, y, fgCanvas.width, 1);
+		}		
+	}
+	this.prepareScanlines();
+
+	this.renderScanlines = function(ctx) {
+		if(scanlines) ctx.drawImage(lineCanvas, 0, 0);
+	}
+
+	this.prepareCursor = function() {
+		// prepare player cursor
+		var ctx = cursorCanvas.getContext("2d");
+		ctx.clearRect(0,0, cursorCanvas.width, cursorCanvas.height);
+		ctx.fillStyle = nocolors ? "#FFF" : "#444";
+		ctx.fillRect(0,0,8,2);
+		ctx.fillRect(24,0,8,2);
+		ctx.fillRect(0,30,8,2);
+		ctx.fillRect(24,30,8,2);
+
+		ctx.fillRect(0,0,2,8);
+		ctx.fillRect(30,0,2,8);
+		ctx.fillRect(0,24,2,8);
+		ctx.fillRect(30,24,2,8)
+	}
+	this.prepareCursor();
+
+	this.renderCursor = function(ctx) {
+		ctx.drawImage(cursorCanvas, player_x - 16, player_y - 16);
+	}
+
 
 	this.renderPlane = function(ctx, msg) {
 		var p = msg[1];
 		var x = msg[2];
 		var y = msg[3];
 		var angle = msg[4] * 0.005;
+
+		if(p === player) {
+			player_x = x;
+			player_y = y;
+		}
 
 		var x_tip = x + (Math.cos(angle) * 12);
 		var y_tip = y - (Math.sin(angle) * 12);
@@ -227,8 +266,7 @@ FlyRenderer = function(player, canvas) {
 		}
 	}
 
-	this.renderMsg = function(msg) {
-		var ctx = canvas.getContext("2d");
+	this.renderMsg = function(msg, ctx) {
 		var type = msg[0];
 
 		switch(type) {
@@ -245,6 +283,17 @@ FlyRenderer = function(player, canvas) {
 				that.renderBonus(ctx, msg);
 				break;
 		}
+	}
+
+	this.renderWorld = function(msgs) {
+		var ctx = canvas.getContext("2d");
+		renderer.renderBackdrop(ctx);
+		for(var i = 0; i < msgs.length; ++i) {
+			renderer.renderMsg(msgs[i], ctx);
+		}
+		renderer.renderForeground(ctx);
+		renderer.renderCursor(ctx);
+		renderer.renderScanlines(ctx);
 	}
 
 	this.getPlayerColor = function(p) {
