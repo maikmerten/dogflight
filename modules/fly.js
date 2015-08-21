@@ -142,7 +142,7 @@ FlyPlane = function(_world, _x, _y, _player) {
 
 	var angle = 0;	 			// plane is horizontal, flies right ->
 	this.angle = angle;
-	var dir = 0;				// 1: turn counter-clockwise, 0: don't turn, -1: turn clockwise
+	var dir = -1;				// 1: turn counter-clockwise, 0: don't turn, -1: turn clockwise
 
 	var fire = false;
 	var lastfire = 0;			// time of firing last
