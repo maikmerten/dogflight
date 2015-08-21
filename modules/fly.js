@@ -156,7 +156,10 @@ FlyPlane = function(_world, _x, _y, _player) {
 	var brake = false;
 
 	var recovertime = 0;
-	var recoverdelay = 1333;	
+	var recoverdelay = 1333;
+
+	var multishottime = 0;
+	var multishotduration = 10000;
 
 	// public members
 	this.health = 100;
@@ -232,6 +235,11 @@ FlyPlane = function(_world, _x, _y, _player) {
 	this.fire = function() {
 		lastfire = world.time;
 		new FlyBullet(world, this.x, this.y, angle, this.player);
+		if(multishottime > world.time) {
+			new FlyBullet(world, this.x, this.y, angle - 0.5 * Math.PI, this.player);
+			new FlyBullet(world, this.x, this.y, angle + 0.5 * Math.PI, this.player);
+			new FlyBullet(world, this.x, this.y, angle + Math.PI, this.player);
+		}
 		new FlySound(world, 0); // Firing sound
 	}
 
@@ -259,6 +267,10 @@ FlyPlane = function(_world, _x, _y, _player) {
 
 	this.setBrake = function(newbrake) {
 		brake = newbrake;
+	}
+
+	this.enableMultiShot = function() {
+		multishottime = world.time + multishotduration;
 	}
 	
 	this.getNetMsg = function() {
@@ -384,7 +396,11 @@ FlyBonus = function(_world, _x, _y) {
 		// find close planes!
 		var other = world.findClosest(this, 20, 0);
 		if(other && other.health > 0) {
-			world.score(5, other.player);
+			if(Math.random() < 0.5) {
+				other.enableMultiShot();
+			} else {
+				world.score(5, other.player);
+			}
 			new FlySound(world, 3); // Bonus pickup
 			world.remove(this);
 		}
