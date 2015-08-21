@@ -437,7 +437,8 @@ FlyBot = function(_world, _plane) {
 			var target = world.findClosest(plane, 200, 0);
 			if(target) {
 				// Arguments for Math.atan2 are "backwards": atan2(y, x)!
-				var angle2 = Math.atan2(target.y - plane.y, target.x - plane.x)
+				// Also note that the y-axis is "downwards", the larger the "more down"
+				var angle2 = Math.atan2(plane.y - target.y, target.x - plane.x)
 				var diff = Math.abs(plane.angle - angle2);
 				plane.setFire(diff < 1.0);
 			} else {
