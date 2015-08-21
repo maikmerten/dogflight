@@ -39,7 +39,7 @@ function Player(player) {
 	this.player = player;
 	this.nick = "Hans";
 	this.score = 0;
-	this.plane = new fly.FlyPlane(world, 320, 240, player);
+	this.plane = new fly.FlyPlane(world, Math.random() * world.getWidth(), Math.random() * world.getHeight(), player);
 }
 
 function nextPlayer() {

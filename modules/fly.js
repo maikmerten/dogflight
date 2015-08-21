@@ -430,33 +430,34 @@ FlyBot = function(_world, _plane) {
 
 	var nextTurn = world.time;
 	var nextTarget = world.time;
+	var target = null;
 
 	this.think = function() {
 		if(world.time > nextTarget) {
 			// find close plane
-			var target = world.findClosest(plane, 200, 0);
-			if(target) {
-				// Arguments for Math.atan2 are "backwards": atan2(y, x)!
-				// Also note that the y-axis is "downwards", the larger the "more down"
-				var angle2 = Math.atan2(plane.y - target.y, target.x - plane.x)
-				var diff = Math.abs(plane.angle - angle2);
-				plane.setFire(diff < 1.0);
-			} else {
-				plane.setFire(false);
-			}
+			target = world.findClosest(plane, 200, 0);
 			nextTarget = world.time + 100;
 		}
 
-		if(world.time > nextTurn) {
-			var r = Math.random();
-			var dir = 0;
-			if(r < 0.3) {
-				dir = 1;
-			} else if(r > 0.7) {
-				dir = -1;
+		if(target) {
+			// Arguments for Math.atan2 are "backwards": atan2(y, x)!
+			// Also note that the y-axis is "downwards", the larger the "more down"
+			var angle2 = Math.atan2(plane.y - target.y, target.x - plane.x)
+			var diff = plane.angle - angle2;
+			plane.setFire(Math.abs(diff) < 0.5);
+		} else {
+			plane.setFire(false);
+			if(world.time > nextTurn) {
+				var r = Math.random();
+				var dir = 0;
+				if(r < 0.4) {
+					dir = 1;
+				} else if(r > 0.6) {
+					dir = -1;
+				}
+				plane.setDir(dir);
+				nextTurn = world.time + (Math.random() * 2000);
 			}
-			plane.setDir(dir);
-			nextTurn = world.time + (Math.random() * 2000);
 		}
 	}
 }
