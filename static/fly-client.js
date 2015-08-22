@@ -3,6 +3,7 @@ FlyRenderer = function(player, canvas) {
 	var that = this;
 	var nocolors = false;
 	var scanlines = true;
+	var markposition = true;
 	var bgCanvas = $("<canvas>").attr("width", canvas.width).attr("height", canvas.height)[0];
 	var fgCanvas = $("<canvas>").attr("width", canvas.width).attr("height", canvas.height)[0];
 	var lineCanvas = $("<canvas>").attr("width", canvas.width).attr("height", canvas.height)[0];
@@ -26,6 +27,14 @@ FlyRenderer = function(player, canvas) {
 		this.prepareBackdrop();
 		this.prepareForeground();
 		this.prepareCursor();
+	}
+
+	this.setMarkPosition = function(enabled) {
+		markposition = enabled;
+	}
+
+	this.setScanlines = function(enabled) {
+		scanlines = enabled;
 	}
 
 	this.prepareBackdrop = function() {
@@ -292,7 +301,7 @@ FlyRenderer = function(player, canvas) {
 			renderer.renderMsg(msgs[i], ctx);
 		}
 		renderer.renderForeground(ctx);
-		renderer.renderCursor(ctx);
+		if(markposition) renderer.renderCursor(ctx);
 		renderer.renderScanlines(ctx);
 	}
 
