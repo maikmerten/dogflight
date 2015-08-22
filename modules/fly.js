@@ -160,6 +160,7 @@ FlyPlane = function(_world, _x, _y, _player) {
 
 	var multishottime = 0;
 	var multishotduration = 15000;
+	var multishottype = 0;
 
 	var rapidfiretime = 0;
 	var rapidfireduration = 20000;
@@ -241,9 +242,14 @@ FlyPlane = function(_world, _x, _y, _player) {
 		lastfire = world.time;
 		new FlyBullet(world, this.x, this.y, angle, this.player);
 		if(multishottime > world.time) {
-			new FlyBullet(world, this.x, this.y, angle - 0.5 * Math.PI, this.player);
-			new FlyBullet(world, this.x, this.y, angle + 0.5 * Math.PI, this.player);
-			new FlyBullet(world, this.x, this.y, angle + Math.PI, this.player);
+			if(multishottype == 0) {
+				new FlyBullet(world, this.x, this.y, angle - 0.5 * Math.PI, this.player);
+				new FlyBullet(world, this.x, this.y, angle + 0.5 * Math.PI, this.player);
+				new FlyBullet(world, this.x, this.y, angle + Math.PI, this.player);
+			} else {
+				new FlyBullet(world, this.x, this.y, angle - 0.125 * Math.PI, this.player);
+				new FlyBullet(world, this.x, this.y, angle + 0.125 * Math.PI, this.player);
+			}
 		}
 		new FlySound(world, 0); // Firing sound
 	}
@@ -274,7 +280,8 @@ FlyPlane = function(_world, _x, _y, _player) {
 		brake = newbrake;
 	}
 
-	this.enableMultiShot = function() {
+	this.enableMultiShot = function(type) {
+		multishottype = type;
 		multishottime = world.time + multishotduration;
 	}
 
@@ -409,9 +416,9 @@ FlyBonus = function(_world, _x, _y) {
 			if(r < 0.33) {
 				other.enableMultiShot();
 			} else if(r < 0.66) {
-				other.enableRapidFire();
+				other.enableRapidFire(0);
 			} else {
-				world.score(5, other.player);
+				other.enableRapidFire(1);
 			}
 			new FlySound(world, 3); // Bonus pickup
 			world.remove(this);
