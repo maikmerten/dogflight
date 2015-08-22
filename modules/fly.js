@@ -414,11 +414,11 @@ FlyBonus = function(_world, _x, _y) {
 		if(other && other.health > 0) {
 			var r = Math.random();
 			if(r < 0.33) {
-				other.enableMultiShot();
+				other.enableMultiShot(0);
 			} else if(r < 0.66) {
-				other.enableRapidFire(0);
+				other.enableMultiShot(1);
 			} else {
-				other.enableRapidFire(1);
+				other.enableRapidFire();
 			}
 			new FlySound(world, 3); // Bonus pickup
 			world.remove(this);
