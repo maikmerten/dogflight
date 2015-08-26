@@ -1,8 +1,8 @@
-class FlyWorld {
+class World {
 
-	constructor(_width, _height) {
-		this.width = _width;
-		this.height = _height;
+	constructor(width, height) {
+		this.width = width;
+		this.height = height;
 		this.entities = [];	// entities in this world
 		this.killents = [];	// entities that are to be removed from this world
 		this.scoreCallback = function(){};
@@ -117,14 +117,6 @@ class FlyWorld {
 		}
 	}
 
-	getWidth() {
-		return this.width;
-	}
-
-	getHeight() {
-		return this.height;
-	}
-
 	setScoreCallback(callback) {
 		this.scoreCallback = callback;
 	}
@@ -134,17 +126,47 @@ class FlyWorld {
 	}
 }
 
+class MovingEntity {
+
+	updateAngle(direction, rotspeed) {
+		var angle = this.angle;
+		angle += direction * (rotspeed * this.world.timedelta);
+		angle = angle < -Math.PI ? angle + (2 * Math.PI) : angle;
+		angle = angle > Math.PI ? angle - (2 * Math.PI) : angle;
+		this.angle = angle;
+	}
+
+	updatePosition(speed) {
+		var x = this.x;
+		var y = this.y;
+		x += this.world.timedelta * (Math.cos(this.angle) * speed);
+		y -= this.world.timedelta * (Math.sin(this.angle) * speed);
+
+		// clamp position to world dimensions
+		var width = this.world.width;
+		var height = this.world.height;
+		x = x < 0 ? x + width : x;
+		x = x > width ? x - width : x;
+
+		y = y < 0 ? y + height : y;
+		y = y > height ? y - height : y;
+
+		this.x = x;
+		this.y = y;
+	}
+}
 
 
-class FlyPlane {
 
-	constructor(_world, _x, _y, _player) {
-		this.world = _world;
+class Plane extends MovingEntity {
+
+	constructor(world, x, y, player) {
+		super();
+		this.world = world;
 		this.world.add(this);
-
-		this.x = _x;
-		this.y = _y;
-		this.player = _player;
+		this.x = x;
+		this.y = y;
+		this.player = player;
 		this.type = 0; // this is a plane!
 		this.health = 100;
 
@@ -207,29 +229,8 @@ class FlyPlane {
 			}
 		}
 
-		// update angle
-		var angle = this.angle;
-		angle += direction * (rotspeed * timedelta);
-		angle = angle < -Math.PI ? angle + (2 * Math.PI) : angle;
-		angle = angle > Math.PI ? angle - (2 * Math.PI) : angle;
-		this.angle = angle;
-
-		var x = this.x;
-		var y = this.y;
-		x += timedelta * (Math.cos(angle) * speed);
-		y -= timedelta * (Math.sin(angle) * speed);
-
-		// clamp position to world dimensions
-		var width = this.world.getWidth();
-		var height = this.world.getHeight();
-		x = x < 0 ? x + width : x;
-		x = x > width ? x - width : x;
-
-		y = y < 0 ? y + height : y;
-		y = y > height ? y - height : y;
-
-		this.x = x;
-		this.y = y;
+		this.updateAngle(direction, rotspeed);
+		this.updatePosition(speed);
 
 		var rapidfire = this.world.time < this.rapidfiretime;
 
@@ -241,18 +242,18 @@ class FlyPlane {
 
 	doFire() {
 		this.lastfire = this.world.time;
-		new FlyBullet(this.world, this.x, this.y, this.angle, this.player);
+		new Bullet(this.world, this.x, this.y, this.angle, this.player);
 		if(this.multishottime > this.world.time) {
 			if(this.multishottype == 0) {
-				new FlyBullet(this.world, this.x, this.y, this.angle - 0.5 * Math.PI, this.player);
-				new FlyBullet(this.world, this.x, this.y, this.angle + 0.5 * Math.PI, this.player);
-				new FlyBullet(this.world, this.x, this.y, this.angle + Math.PI, this.player);
+				new Bullet(this.world, this.x, this.y, this.angle - 0.5 * Math.PI, this.player);
+				new Bullet(this.world, this.x, this.y, this.angle + 0.5 * Math.PI, this.player);
+				new Bullet(this.world, this.x, this.y, this.angle + Math.PI, this.player);
 			} else {
-				new FlyBullet(this.world, this.x, this.y, this.angle - 0.125 * Math.PI, this.player);
-				new FlyBullet(this.world, this.x, this.y, this.angle + 0.125 * Math.PI, this.player);
+				new Bullet(this.world, this.x, this.y, this.angle - 0.125 * Math.PI, this.player);
+				new Bullet(this.world, this.x, this.y, this.angle + 0.125 * Math.PI, this.player);
 			}
 		}
-		new FlySound(this.world, 0); // Firing sound
+		new Sound(this.world, 0); // Firing sound
 	}
 
 	receiveDamage(dmg) {
@@ -300,15 +301,16 @@ class FlyPlane {
 	}
 }
 
-class FlyBullet {
+class Bullet extends MovingEntity{
 
-	constructor(_world, _x, _y, _angle, _player) {
-		this.world = _world;
+	constructor(world, x, y, angle, player) {
+		super();
+		this.world = world;
 		this.world.add(this);
-		this.x = _x;
-		this.y = _y;
-		this.player = _player;
-		this.angle = _angle;
+		this.x = x;
+		this.y = y;
+		this.player = player;
+		this.angle = angle;
 		this.type = 1;			 // this is a bullet!
 	
 		this.speed = 300; 		// pixels per second!
@@ -318,28 +320,13 @@ class FlyBullet {
 
 	// Quake-style think function :)
 	think() {
-		var x = this.x;
-		var y = this.y;
-		x += this.world.timedelta * (Math.cos(this.angle) * this.speed);
-		y -= this.world.timedelta * (Math.sin(this.angle) * this.speed);
-
-		// clamp position to world dimensions
-		var width = this.world.getWidth();
-		var height = this.world.getHeight();
-		x = x < 0 ? x + width : x;
-		x = x > width ? x - width : x;
-
-		y = y < 0 ? y + height : y;
-		y = y > height ? y - height : y;
-
-		this.x = x;
-		this.y = y;
+		this.updatePosition(this.speed);
 
 		// find close planes!
 		var other = this.world.findClosest(this, 20, 0);
 		if(other && other.player != this.player && other.health > 0) {
 			other.receiveDamage(200);
-			new FlySound(this.world, 1); // Hit sound
+			new Sound(this.world, 1); // Hit sound
 			this.world.score(1, this.player, other.player);
 			this.world.remove(this);
 		}
@@ -360,29 +347,16 @@ class FlyBullet {
 }
 
 
-class FlySound {
 
-	constructor(_world, _sound) {
-		this.world = _world;
+
+class Bonus extends MovingEntity {
+
+	constructor(world, x, y) {
+		super();
+		this.world = world;
 		this.world.add(this);
-		this.sound = _sound;
-		this.type = 2; // this is a sound effect
-	}
-
-	getNetMsg() {
-		var msg = [this.type, this.sound];
-		this.world.remove(this);
-		return msg;
-	}
-}
-
-class FlyBonus {
-
-	constructor(_world, _x, _y) {
-		this.world = _world;
-		this.world.add(this);
-		this.x = _x;
-		this.y = _y;
+		this.x = x;
+		this.y = y;
 		this.type = 3; // this is a bonus item
 
 		this.angle = Math.random() * 2.0;
@@ -391,22 +365,7 @@ class FlyBonus {
 	}
 
 	think() {
-		var x = this.x;
-		var y = this.y;
-		x += this.world.timedelta * (Math.cos(this.angle) * this.speed);
-		y -= this.world.timedelta * (Math.sin(this.angle) * this.speed);
-
-		// clamp position to world dimensions
-		var width = this.world.getWidth();
-		var height = this.world.getHeight();
-		x = x < 0 ? x + width : x;
-		x = x > width ? x - width : x;
-
-		y = y < 0 ? y + height : y;
-		y = y > height ? y - height : y;
-
-		this.x = x;
-		this.y = y;
+		this.updatePosition(this.speed);		
 
 		// find close planes!
 		var other = this.world.findClosest(this, 20, 0);
@@ -419,7 +378,7 @@ class FlyBonus {
 			} else {
 				other.enableRapidFire();
 			}
-			new FlySound(this.world, 3); // Bonus pickup
+			new Sound(this.world, 3); // Bonus pickup
 			this.world.remove(this);
 		}
 
@@ -438,10 +397,10 @@ class FlyBonus {
 	}
 }
 
-class FlyBonusSpawner {
+class BonusSpawner {
 
-	constructor(_world) {
-		this.world = _world;
+	constructor(world) {
+		this.world = world;
 		this.world.add(this);
 		this.nextspawn = 0;
 	}
@@ -453,18 +412,18 @@ class FlyBonusSpawner {
 		// find planes
 		var planes = this.world.findType(0);
 		if(planes.length > 0) {
-			new FlyBonus(this.world, this.world.getWidth() * Math.random(), this.world.getHeight() * Math.random());
-			new FlySound(this.world, 2); // Bonus spawn sound
+			new Bonus(this.world, this.world.width * Math.random(), this.world.height * Math.random());
+			new Sound(this.world, 2); // Bonus spawn sound
 		}
 	}
 }
 
-class FlyBot {
+class Bot {
 
-	constructor(_world, _plane) {
-		this.world = _world;
+	constructor(world, plane) {
+		this.world = world;
 		this.world.add(this);
-		this.plane = _plane;
+		this.plane = plane;
 
 		this.nextTurn = this.world.time;
 		this.nextTarget = this.world.time;
@@ -502,13 +461,29 @@ class FlyBot {
 }
 
 
+class Sound {
+
+	constructor(world, sound) {
+		this.world = world;
+		this.world.add(this);
+		this.sound = sound;
+		this.type = 2; // this is a sound effect
+	}
+
+	getNetMsg() {
+		var msg = [this.type, this.sound];
+		this.world.remove(this);
+		return msg;
+	}
+}
+
 
 module.exports = {
-	"FlyWorld" : FlyWorld,
-	"FlyPlane" : FlyPlane,
-	"FlyBullet": FlyBullet,
-	"FlyBonus" : FlyBonus,
-	"FlyBonusSpawner" : FlyBonusSpawner,
-	"FlySound" : FlySound,
-	"FlyBot"   : FlyBot
+	"FlyWorld" : World,
+	"FlyPlane" : Plane,
+	"FlyBullet": Bullet,
+	"FlyBonus" : Bonus,
+	"FlyBonusSpawner" : BonusSpawner,
+	"FlySound" : Sound,
+	"FlyBot"   : Bot
 }

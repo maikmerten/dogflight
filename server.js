@@ -39,7 +39,7 @@ function Player(player) {
 	this.player = player;
 	this.nick = "Hans";
 	this.score = 0;
-	this.plane = new fly.FlyPlane(world, Math.random() * world.getWidth(), Math.random() * world.getHeight(), player);
+	this.plane = new fly.FlyPlane(world, Math.random() * world.width, Math.random() * world.height, player);
 }
 
 function nextPlayer() {
@@ -170,8 +170,8 @@ io.on('connection', function(socket){
 
 		var joininfo = {
 			"player" : player,
-			"width" : world.getWidth(),
-			"height" : world.getHeight()
+			"width" : world.width,
+			"height" : world.height
 		}
 		socket.emit("joinInfo", joininfo);
 		sendScores();
