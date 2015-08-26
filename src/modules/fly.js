@@ -17,19 +17,19 @@ class World {
 		this.time = now;
 
 		// remove entities marked for removal
-		for(let i = 0; i < this.killents.length; ++i) {
-			let idx = this.entities.indexOf(this.killents[i]);
+		for(let kent of this.killents) {
+			let idx = this.entities.indexOf(kent);
 			if(idx >= 0) {
 				this.entities.splice(idx, 1);
 			}
 		}
-		this.killents = [];
+		// clear array of entities to be removed
+		this.killents.length = 0;
 
 		// ensure all remaining entities think
-		for(let i = 0; i < this.entities.length; ++i) {
-			let ent = this.entities[i];
+		for(let ent of this.entities) {
 			if("think" in ent) {
-				this.entities[i].think();
+				ent.think();
 			}
 		}
 	}
@@ -40,8 +40,7 @@ class World {
 		var x = ent.x;
 		var y = ent.y;
 
-		for(let i = 0; i < this.entities.length; ++i) {
-			let e2 = this.entities[i];
+		for(let e2 of this.entities) {
 			if(e2 === ent || (type && e2.type != type)) {
 				continue;
 			}
@@ -63,8 +62,7 @@ class World {
 		var x = ent.x;
 		var y = ent.y;
 
-		for(let i = 0; i < this.entities.length; ++i) {
-			let e2 = this.entities[i];
+		for(let e2 of this.entities) {
 			if(e2 === ent || (type && e2.type != type)) {
 				continue;
 			}
@@ -83,20 +81,17 @@ class World {
 
 	findType(type) {
 		var result = [];
-		for(var i = 0; i < this.entities.length; ++i) {
-			let ent = this.entities[i];
+		for(let ent of this.entities) {
 			if(ent.type === type) {
 				result.push(ent);
 			}
 		}
-
 		return result;
 	}
 
 	getNetMsg() {
 		var msg = [];
-		for(let i = 0; i < this.entities.length; ++i) {
-			let ent = this.entities[i];
+		for(let ent of this.entities) {
 			if("getNetMsg" in ent) {
 				msg.push(ent.getNetMsg());
 			}
