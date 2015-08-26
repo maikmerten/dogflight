@@ -1,4 +1,4 @@
-FlyWorld = function(_width, _height) {
+var FlyWorld = function(_width, _height) {
 	var that = this;
 	var width = _width;
 	var height = _height;
@@ -134,7 +134,7 @@ FlyWorld = function(_width, _height) {
 
 
 
-FlyPlane = function(_world, _x, _y, _player) {
+var FlyPlane = function(_world, _x, _y, _player) {
 
 	var that = this;
 	var world = _world;
@@ -300,7 +300,7 @@ FlyPlane = function(_world, _x, _y, _player) {
 	}
 }
 
-FlyBullet = function(_world, _x, _y, _angle, _player) {
+var FlyBullet = function(_world, _x, _y, _angle, _player) {
 
 	var that = this;
 	var world = _world;
@@ -363,7 +363,7 @@ FlyBullet = function(_world, _x, _y, _angle, _player) {
 }
 
 
-FlySound = function(_world, _sound) {
+var FlySound = function(_world, _sound) {
 	var that = this;
 	var world = _world;
 	world.add(this);
@@ -377,7 +377,7 @@ FlySound = function(_world, _sound) {
 	}
 }
 
-FlyBonus = function(_world, _x, _y) {
+var FlyBonus = function(_world, _x, _y) {
 	var that = this;
 	var world = _world;
 	world.add(this);
@@ -439,7 +439,7 @@ FlyBonus = function(_world, _x, _y) {
 	}
 }
 
-FlyBonusSpawner = function(_world) {
+var FlyBonusSpawner = function(_world) {
 	var world = _world;
 	world.add(this);
 	var nextspawn = 0;
@@ -457,7 +457,7 @@ FlyBonusSpawner = function(_world) {
 	}
 }
 
-FlyBot = function(_world, _plane) {
+var FlyBot = function(_world, _plane) {
 	var that = this;
 	var world = _world;
 	var plane = _plane;
@@ -497,9 +497,7 @@ FlyBot = function(_world, _plane) {
 	}
 }
 
-if(!module) {
-	var module = {};
-}
+
 
 module.exports = {
 	"FlyWorld" : FlyWorld,
