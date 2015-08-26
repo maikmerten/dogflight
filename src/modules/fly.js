@@ -8,14 +8,13 @@ class World {
 		this.scoreCallback = function(){};
 
 		this.time = new Date().getTime();
-		this.lasttic = this.time;
 	}
 
 	think() {
 		// update time
-		this.time = new Date().getTime();
-		this.timedelta = (this.time - this.lasttic) * 0.001;
-		this.lasttic = this.time;
+		var now = new Date().getTime();
+		this.timedelta = (now - this.time) * 0.001;
+		this.time = now;
 
 		// remove entities marked for removal
 		for(let i = 0; i < this.killents.length; ++i) {
@@ -42,13 +41,13 @@ class World {
 		var y = ent.y;
 
 		for(let i = 0; i < this.entities.length; ++i) {
-			var e2 = this.entities[i];
+			let e2 = this.entities[i];
 			if(e2 === ent || (type && e2.type != type)) {
 				continue;
 			}
-			var xdelta = x - e2.x;
-			var ydelta = y - e2.y;
-			var dist_squared = (xdelta*xdelta)+(ydelta*ydelta);
+			let xdelta = x - e2.x;
+			let ydelta = y - e2.y;
+			let dist_squared = (xdelta*xdelta)+(ydelta*ydelta);
 			if(dist_squared <= radius_squared) {
 				result.push(e2);
 			}
@@ -65,14 +64,14 @@ class World {
 		var y = ent.y;
 
 		for(let i = 0; i < this.entities.length; ++i) {
-			var e2 = this.entities[i];
+			let e2 = this.entities[i];
 			if(e2 === ent || (type && e2.type != type)) {
 				continue;
 			}
 
-			var xdelta = x - e2.x;
-			var ydelta = y - e2.y;
-			var dist_squared = (xdelta*xdelta)+(ydelta*ydelta);
+			let xdelta = x - e2.x;
+			let ydelta = y - e2.y;
+			let dist_squared = (xdelta*xdelta)+(ydelta*ydelta);
 			if(dist_squared <= radius_squared && dist_squared < best) {
 				result = e2;
 				best = dist_squared;
