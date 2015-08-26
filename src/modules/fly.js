@@ -300,35 +300,32 @@ class FlyPlane {
 	}
 }
 
-var FlyBullet = function(_world, _x, _y, _angle, _player) {
+class FlyBullet {
 
-	var that = this;
-	var world = _world;
-	world.add(this);
-
-	var angle = _angle;
-	var speed = 300; 		// pixels per second!
-	var lifeTime = 700;		// milliseconds before removal
-	var endTime = world.time + lifeTime;
-
-	// public members
-	this.x = _x;
-	this.y = _y;
-	this.player = _player;
-	this.type = 1; // this is a bullet!
+	constructor(_world, _x, _y, _angle, _player) {
+		this.world = _world;
+		this.world.add(this);
+		this.x = _x;
+		this.y = _y;
+		this.player = _player;
+		this.angle = _angle;
+		this.type = 1;			 // this is a bullet!
+	
+		this.speed = 300; 		// pixels per second!
+		this.lifeTime = 700;	// milliseconds before removal
+		this.endTime = this.world.time + this.lifeTime;
+	}
 
 	// Quake-style think function :)
-	this.think = function() {
-		var timedelta = world.timedelta;
-
+	think() {
 		var x = this.x;
 		var y = this.y;
-		x += timedelta * (Math.cos(angle) * speed);
-		y -= timedelta * (Math.sin(angle) * speed);
+		x += this.world.timedelta * (Math.cos(this.angle) * this.speed);
+		y -= this.world.timedelta * (Math.sin(this.angle) * this.speed);
 
 		// clamp position to world dimensions
-		var width = world.getWidth();
-		var height = world.getHeight();
+		var width = this.world.getWidth();
+		var height = this.world.getHeight();
 		x = x < 0 ? x + width : x;
 		x = x > width ? x - width : x;
 
@@ -339,21 +336,21 @@ var FlyBullet = function(_world, _x, _y, _angle, _player) {
 		this.y = y;
 
 		// find close planes!
-		var other = world.findClosest(this, 20, 0);
+		var other = this.world.findClosest(this, 20, 0);
 		if(other && other.player != this.player && other.health > 0) {
 			other.receiveDamage(200);
-			new FlySound(world, 1); // Hit sound
-			world.score(1, this.player, other.player);
-			world.remove(this);
+			new FlySound(this.world, 1); // Hit sound
+			this.world.score(1, this.player, other.player);
+			this.world.remove(this);
 		}
 
 		// this bullet expired
-		if(world.time > endTime) {
-			world.remove(this);
+		if(this.world.time > this.endTime) {
+			this.world.remove(this);
 		}
 	}
 
-	this.getNetMsg = function() {
+	getNetMsg() {
 		return [
 			(this.type|0),
 			(this.x|0),
