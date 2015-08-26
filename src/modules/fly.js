@@ -136,80 +136,79 @@ class FlyWorld {
 
 
 
-var FlyPlane = function(_world, _x, _y, _player) {
+class FlyPlane {
 
-	var that = this;
-	var world = _world;
-	world.add(this);
+	constructor(_world, _x, _y, _player) {
+		this.world = _world;
+		this.world.add(this);
 
-	var angle = 0;	 			// plane is horizontal, flies right ->
-	this.angle = angle;
-	var dir = -1;				// 1: turn counter-clockwise, 0: don't turn, -1: turn clockwise
+		this.x = _x;
+		this.y = _y;
+		this.player = _player;
+		this.type = 0; // this is a plane!
+		this.health = 100;
 
-	var fire = false;
-	var lastfire = 0;			// time of firing last
-	var firedelay = 700;
+		this.angle = 0;	 			// plane is horizontal, flies right ->
+		this.dir = -1;				// 1: turn counter-clockwise, 0: don't turn, -1: turn clockwise
 
-	var boost = false;
-	var boostfuel = 100;
-	var boostrecovery = 10; 	// boost fuel recovered per second
-	var boostconsumption = 40;	// boost fuel consumed per second
+		this.fire = false;
+		this.lastfire = 0;			// time of firing last
+		this.firedelay = 700;
 
-	var brake = false;
+		this.boost = false;
+		this.boostfuel = 100;
+		this.boostrecovery = 10; 	// boost fuel recovered per second
+		this.boostconsumption = 40;	// boost fuel consumed per second
 
-	var recovertime = 0;
-	var recoverdelay = 1333;
+		this.brake = false;
 
-	var multishottime = 0;
-	var multishotduration = 15000;
-	var multishottype = 0;
+		this.recovertime = 0;
+		this.recoverdelay = 1333;
 
-	var rapidfiretime = 0;
-	var rapidfireduration = 20000;
+		this.multishottime = 0;
+		this.multishotduration = 15000;
+		this.multishottype = 0;
 
-	// public members
-	this.health = 100;
-	this.x = _x;
-	this.y = _y;
-	this.player = _player;
-	this.type = 0; // this is a plane!
+		this.rapidfiretime = 0;
+		this.rapidfireduration = 20000;
+	}
 
 	// Quake-style think function :)
-	this.think = function() {
-		var timedelta = world.timedelta;
+	think() {
+		var timedelta = this.world.timedelta;
 
-		var direction = dir;
+		var direction = this.dir;
 		var rotspeed = 1.9;
 		var speed = 100; 			// pixels per second!
 
-		if(brake) {
+		if(this.brake) {
 			speed -= 40;
 			rotspeed *= 1.2;
 		}
 
-		if(boost) {
-			boostfuel -= boostconsumption * timedelta;
-			if(boostfuel > 0) {
+		if(this.boost) {
+			this.boostfuel -= this.boostconsumption * timedelta;
+			if(this.boostfuel > 0) {
 				speed += 75;
 				rotspeed *= 1.2;
 			}
 		} else {
-			boostfuel += boostrecovery * timedelta;
+			this.boostfuel += this.boostrecovery * timedelta;
 		}
-		boostfuel = Math.min(100, boostfuel);
-		boostfuel = Math.max(0, boostfuel);
+		this.boostfuel = Math.min(100, Math.max(0, this.boostfuel));
 
 		// rotate if dead
 		if(this.health <= 0) {
 			direction = 1;
 			rotspeed = 15;
 			speed = 0;
-			if(world.time > recovertime) {
+			if(this.world.time > this.recovertime) {
 				this.health = 100;
 			}
 		}
 
 		// update angle
+		var angle = this.angle;
 		angle += direction * (rotspeed * timedelta);
 		angle = angle < -Math.PI ? angle + (2 * Math.PI) : angle;
 		angle = angle > Math.PI ? angle - (2 * Math.PI) : angle;
@@ -221,8 +220,8 @@ var FlyPlane = function(_world, _x, _y, _player) {
 		y -= timedelta * (Math.sin(angle) * speed);
 
 		// clamp position to world dimensions
-		var width = world.getWidth();
-		var height = world.getHeight();
+		var width = this.world.getWidth();
+		var height = this.world.getHeight();
 		x = x < 0 ? x + width : x;
 		x = x > width ? x - width : x;
 
@@ -232,72 +231,71 @@ var FlyPlane = function(_world, _x, _y, _player) {
 		this.x = x;
 		this.y = y;
 
-		var rapidfire = world.time < rapidfiretime;
+		var rapidfire = this.world.time < this.rapidfiretime;
 
 		// fire if ready
-		if(fire && this.health > 0 && world.time > lastfire + (firedelay * (rapidfire ? 0.33 : 1.0))) {
-			this.fire();
+		if(this.fire && this.health > 0 && this.world.time > this.lastfire + (this.firedelay * (rapidfire ? 0.33 : 1.0))) {
+			this.doFire();
 		}
 	}
 
-	this.fire = function() {
-		lastfire = world.time;
-		new FlyBullet(world, this.x, this.y, angle, this.player);
-		if(multishottime > world.time) {
-			if(multishottype == 0) {
-				new FlyBullet(world, this.x, this.y, angle - 0.5 * Math.PI, this.player);
-				new FlyBullet(world, this.x, this.y, angle + 0.5 * Math.PI, this.player);
-				new FlyBullet(world, this.x, this.y, angle + Math.PI, this.player);
+	doFire() {
+		this.lastfire = this.world.time;
+		new FlyBullet(this.world, this.x, this.y, this.angle, this.player);
+		if(this.multishottime > this.world.time) {
+			if(this.multishottype == 0) {
+				new FlyBullet(this.world, this.x, this.y, this.angle - 0.5 * Math.PI, this.player);
+				new FlyBullet(this.world, this.x, this.y, this.angle + 0.5 * Math.PI, this.player);
+				new FlyBullet(this.world, this.x, this.y, this.angle + Math.PI, this.player);
 			} else {
-				new FlyBullet(world, this.x, this.y, angle - 0.125 * Math.PI, this.player);
-				new FlyBullet(world, this.x, this.y, angle + 0.125 * Math.PI, this.player);
+				new FlyBullet(this.world, this.x, this.y, this.angle - 0.125 * Math.PI, this.player);
+				new FlyBullet(this.world, this.x, this.y, this.angle + 0.125 * Math.PI, this.player);
 			}
 		}
-		new FlySound(world, 0); // Firing sound
+		new FlySound(this.world, 0); // Firing sound
 	}
 
-	this.receiveDamage = function(dmg) {
+	receiveDamage(dmg) {
 		this.health -= dmg;
 		if(this.health <= 0) {
-			recovertime = world.time + recoverdelay;
+			this.recovertime = this.world.time + this.recoverdelay;
 		}
 	}
+
+	setDir(newdir) {
+		this.dir = newdir;
+		this.dir = this.dir < -1 ? -1 : this.dir;
+		this.dir = this.dir > 1 ? 1 : this.dir;
+	}
+
+	setFire(newfire) {
+		this.fire = newfire;
+	}
+
+	setBoost(newboost) {
+		this.boost = newboost;
+	}
+
+	setBrake(newbrake) {
+		this.brake = newbrake;
+	}
+
+	enableMultiShot(type) {
+		this.multishottype = type;
+		this.multishottime = this.world.time + this.multishotduration;
+	}
+
+	enableRapidFire() {
+		this.rapidfiretime = this.world.time + this.rapidfireduration;
+	}
 	
-
-	this.setDir = function(newdir) {
-		dir = newdir;
-		dir = dir < -1 ? -1 : dir;
-		dir = dir > 1 ? 1 : dir;
-	}
-
-	this.setFire = function(newfire) {
-		fire = newfire;
-	}
-
-	this.setBoost = function(newboost) {
-		boost = newboost;
-	}
-
-	this.setBrake = function(newbrake) {
-		brake = newbrake;
-	}
-
-	this.enableMultiShot = function(type) {
-		multishottype = type;
-		multishottime = world.time + multishotduration;
-	}
-
-	this.enableRapidFire = function() {
-		rapidfiretime = world.time + rapidfireduration;
-	}
-	
-	this.getNetMsg = function() {
+	getNetMsg() {
 		return [
 			(this.type|0),
 			(this.player|0),
 			(this.x|0),
 			(this.y|0),
-			((angle * 200)|0)
+			((this.angle * 200)|0)
 		];
 	}
 }
