@@ -376,29 +376,29 @@ class FlySound {
 	}
 }
 
-var FlyBonus = function(_world, _x, _y) {
-	var that = this;
-	var world = _world;
-	world.add(this);
-	var angle = Math.random() * 2.0;
-	var speed = 40;
-	var expiretime = world.time + 10000;
+class FlyBonus {
 
-	this.type = 3; // this is a bonus item
-	this.x = _x;
-	this.y = _y;
+	constructor(_world, _x, _y) {
+		this.world = _world;
+		this.world.add(this);
+		this.x = _x;
+		this.y = _y;
+		this.type = 3; // this is a bonus item
 
-	this.think = function() {
-		var timedelta = world.timedelta;
+		this.angle = Math.random() * 2.0;
+		this.speed = 40;
+		this.expiretime = this.world.time + 10000;
+	}
 
+	think() {
 		var x = this.x;
 		var y = this.y;
-		x += timedelta * (Math.cos(angle) * speed);
-		y -= timedelta * (Math.sin(angle) * speed);
+		x += this.world.timedelta * (Math.cos(this.angle) * this.speed);
+		y -= this.world.timedelta * (Math.sin(this.angle) * this.speed);
 
 		// clamp position to world dimensions
-		var width = world.getWidth();
-		var height = world.getHeight();
+		var width = this.world.getWidth();
+		var height = this.world.getHeight();
 		x = x < 0 ? x + width : x;
 		x = x > width ? x - width : x;
 
@@ -409,7 +409,7 @@ var FlyBonus = function(_world, _x, _y) {
 		this.y = y;
 
 		// find close planes!
-		var other = world.findClosest(this, 20, 0);
+		var other = this.world.findClosest(this, 20, 0);
 		if(other && other.health > 0) {
 			var r = Math.random();
 			if(r < 0.33) {
@@ -419,17 +419,17 @@ var FlyBonus = function(_world, _x, _y) {
 			} else {
 				other.enableRapidFire();
 			}
-			new FlySound(world, 3); // Bonus pickup
-			world.remove(this);
+			new FlySound(this.world, 3); // Bonus pickup
+			this.world.remove(this);
 		}
 
-		if(world.time > expiretime) {
-			world.remove(this);
+		if(this.world.time > this.expiretime) {
+			this.world.remove(this);
 		}
 
 	}
 
-	this.getNetMsg = function() {
+	getNetMsg() {
 		return [
 			(this.type|0),
 			(this.x|0),
@@ -438,20 +438,23 @@ var FlyBonus = function(_world, _x, _y) {
 	}
 }
 
-var FlyBonusSpawner = function(_world) {
-	var world = _world;
-	world.add(this);
-	var nextspawn = 0;
+class FlyBonusSpawner {
 
-	this.think = function() {
-		if(world.time < nextspawn) return;
-		nextspawn = world.time + 15000 + Math.random() * 45000;
+	constructor(_world) {
+		this.world = _world;
+		this.world.add(this);
+		this.nextspawn = 0;
+	}
+
+	think() {
+		if(this.world.time < this.nextspawn) return;
+		this.nextspawn = this.world.time + 15000 + Math.random() * 45000;
 
 		// find planes
-		var planes = world.findType(0);
+		var planes = this.world.findType(0);
 		if(planes.length > 0) {
-			new FlyBonus(world, world.getWidth() * Math.random(), world.getHeight() * Math.random());
-			new FlySound(world, 2); // Bonus spawn sound
+			new FlyBonus(this.world, this.world.getWidth() * Math.random(), this.world.getHeight() * Math.random());
+			new FlySound(this.world, 2); // Bonus spawn sound
 		}
 	}
 }
