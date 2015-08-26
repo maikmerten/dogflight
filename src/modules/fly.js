@@ -1,46 +1,48 @@
-var FlyWorld = function(_width, _height) {
-	var that = this;
-	var width = _width;
-	var height = _height;
-	var entities = [];	// entities in this world
-	var killents = [];	// entities that are to be removed from this world
-	var scoreCallback = function(){};
+class FlyWorld {
 
-	this.time = new Date().getTime();
-	var lasttic = this.time;
+	constructor(_width, _height) {
+		this.width = _width;
+		this.height = _height;
+		this.entities = [];	// entities in this world
+		this.killents = [];	// entities that are to be removed from this world
+		this.scoreCallback = function(){};
 
-	this.think = function() {
+		this.time = new Date().getTime();
+		this.lasttic = this.time;
+	}
+
+	think() {
 		// update time
 		this.time = new Date().getTime();
-		this.timedelta = (this.time - lasttic) * 0.001;
-		lasttic = this.time;
+		this.timedelta = (this.time - this.lasttic) * 0.001;
+		this.lasttic = this.time;
 
 		// remove entities marked for removal
-		for(var i = 0; i < killents.length; ++i) {
-			var idx = entities.indexOf(killents[i]);
+		for(let i = 0; i < this.killents.length; ++i) {
+			let idx = this.entities.indexOf(this.killents[i]);
 			if(idx >= 0) {
-				entities.splice(idx, 1);
+				this.entities.splice(idx, 1);
 			}
 		}
-		killents = [];
+		this.killents = [];
 
 		// ensure all remaining entities think
-		for(var i = 0; i < entities.length; ++i) {
-			var ent = entities[i];
+		for(let i = 0; i < this.entities.length; ++i) {
+			let ent = this.entities[i];
 			if("think" in ent) {
-				entities[i].think();
+				this.entities[i].think();
 			}
 		}
 	}
 
-	this.findRadius = function(ent, radius, type) {
+	findRadius(ent, radius, type) {
 		var radius_squared = radius * radius;
 		var result = [];
 		var x = ent.x;
 		var y = ent.y;
 
-		for(var i = 0; i < entities.length; ++i) {
-			var e2 = entities[i];
+		for(let i = 0; i < this.entities.length; ++i) {
+			var e2 = this.entities[i];
 			if(e2 === ent || (type && e2.type != type)) {
 				continue;
 			}
@@ -55,15 +57,15 @@ var FlyWorld = function(_width, _height) {
 		return result;
 	}
 
-	this.findClosest = function(ent, radius, type) {
+	findClosest(ent, radius, type) {
 		var radius_squared = radius * radius;
 		var result = null;
 		var best = radius_squared + 9;
 		var x = ent.x;
 		var y = ent.y;
 
-		for(var i = 0; i < entities.length; ++i) {
-			var e2 = entities[i];
+		for(let i = 0; i < this.entities.length; ++i) {
+			var e2 = this.entities[i];
 			if(e2 === ent || (type && e2.type != type)) {
 				continue;
 			}
@@ -80,10 +82,10 @@ var FlyWorld = function(_width, _height) {
 		return result;
 	}
 
-	this.findType = function(type) {
+	findType(type) {
 		var result = [];
-		for(var i = 0; i < entities.length; ++i) {
-			var ent = entities[i];
+		for(var i = 0; i < this.entities.length; ++i) {
+			let ent = this.entities[i];
 			if(ent.type === type) {
 				result.push(ent);
 			}
@@ -92,10 +94,10 @@ var FlyWorld = function(_width, _height) {
 		return result;
 	}
 
-	this.getNetMsg = function() {
+	getNetMsg() {
 		var msg = [];
-		for(var i = 0; i < entities.length; ++i) {
-			var ent = entities[i];
+		for(let i = 0; i < this.entities.length; ++i) {
+			let ent = this.entities[i];
 			if("getNetMsg" in ent) {
 				msg.push(ent.getNetMsg());
 			}
@@ -103,32 +105,32 @@ var FlyWorld = function(_width, _height) {
 		return msg;
 	}
 
-	this.add = function(ent) {
-		if(entities.indexOf(ent) < 0) {
-			entities.push(ent);
+	add(ent) {
+		if(this.entities.indexOf(ent) < 0) {
+			this.entities.push(ent);
 		}
 	}
 
-	this.remove = function(ent) {
-		if(killents.indexOf(ent) < 0) {
-			killents.push(ent);
+	remove(ent) {
+		if(this.killents.indexOf(ent) < 0) {
+			this.killents.push(ent);
 		}
 	}
 
-	this.getWidth = function() {
-		return width;
+	getWidth() {
+		return this.width;
 	}
 
-	this.getHeight = function() {
-		return height;
+	getHeight() {
+		return this.height;
 	}
 
-	this.setScoreCallback = function(callback) {
-		scoreCallback = callback;
+	setScoreCallback(callback) {
+		this.scoreCallback = callback;
 	}
 
-	this.score = function(points, player, other) {
-		scoreCallback(points, player, other);
+	score(points, player, other) {
+		this.scoreCallback(points, player, other);
 	}
 }
 
