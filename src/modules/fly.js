@@ -360,16 +360,18 @@ class FlyBullet {
 }
 
 
-var FlySound = function(_world, _sound) {
-	var that = this;
-	var world = _world;
-	world.add(this);
-	this.type = 2; // this is a sound effect
-	this.sound = _sound;
+class FlySound {
 
-	this.getNetMsg = function() {
+	constructor(_world, _sound) {
+		this.world = _world;
+		this.world.add(this);
+		this.sound = _sound;
+		this.type = 2; // this is a sound effect
+	}
+
+	getNetMsg() {
 		var msg = [this.type, this.sound];
-		world.remove(this);
+		this.world.remove(this);
 		return msg;
 	}
 }
