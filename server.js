@@ -3,7 +3,7 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var argv = require('yargs').argv;
-var fly = require("./modules/fly-babel");
+var fly = require("./modules/fly");
 
 // determine if minified JavaScript resources are served
 var minjs = ".min";

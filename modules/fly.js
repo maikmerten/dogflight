@@ -1,3 +1,5 @@
+"use strict"
+
 class World {
 
 	constructor(width, height) {
