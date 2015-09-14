@@ -10,5 +10,4 @@ A web-based multiplayer game that simulates arcade-style aerial dogfighting.
  * Clone a copy of Dogflight!: **`git clone https://github.com/maikmerten/dogflight.git`**
  * Enter the directory with the Dogflight! clone: **`cd dogflight`**
  * Ensure that all dependencies are installed: **`npm install`**
- * Transpile the source files into plain old Javascript: **`npm run babel`**
  * Start the Dogflight! server: **`node server`**
